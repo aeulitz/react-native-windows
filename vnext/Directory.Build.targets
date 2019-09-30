@@ -47,4 +47,7 @@
     <Message Text="=> VCTargetsPath           [$(VCTargetsPath)]" />
   </Target>
 
+  <Import
+    Condition="$(RNWBuildOverrideTargets) != ''"
+    Project="$(RNWBuildOverrideTargets)"/>
 </Project>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!--
+    It might seem unusual to set a property in a *.targets file, but - even if additive -
+    $ExecutablePath assignments in the respective *.props file preclude assignments to the same
+    property by the rest of the build system (i.e. the build system appears to make $ExecutablePath
+    assignments only if the property is unset).
+
+
+    $(Platform)
+    $(Configuration)
+
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx64\arm\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx64\arm64\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx64\chpe\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx64\x64\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx64\x86\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx86\arm\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx86\arm64\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx86\chpe\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx86\x64\cl.exe
+    D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\bin\Hostx86\x86\cl.exe
+    -->
+
+    <VisualCppTools>D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2</VisualCppTools>
+    <OfficeHeaders>D:\ISS\private-rnw\vnext\packages\Microsoft.VCCompiler.Headers.Office.14.13.26133.6</OfficeHeaders>
+    <WindowsSDKBin>D:\ISS\private-rnw\vnext\packages\WindowsSDKBin.10.0.18847</WindowsSDKBin>
+    <WindowsSDKHeaders>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6</WindowsSDKHeaders>
+    <WindowsSDKTools>D:\ISS\private-rnw\vnext\packages\WindowsSDKTools.10.0.18847.1</WindowsSDKTools>
+
+    <HostArchitecture Condition="'$(PROCESSOR_ARCHITECTURE)' == 'AMD64' Or '$(PROCESSOR_ARCHITEW6432)' == 'AMD64'">Hostx64</HostArchitecture>
+    <HostArchitecture Condition="'$(PROCESSOR_ARCHITECTURE)' != 'AMD64' And '$(PROCESSOR_ARCHITEW6432)' != 'AMD64'">Hostx86</HostArchitecture>
+
+    <TargetArchitecture Condition="'$(Platform)' == 'arm'">arm</TargetArchitecture>
+    <TargetArchitecture Condition="'$(Platform)' == 'arm64'">arm64</TargetArchitecture>
+    <TargetArchitecture Condition="'$(Platform)' == 'chpe'">chpe</TargetArchitecture>
+    <TargetArchitecture Condition="'$(Platform)' == 'x64'">x64</TargetArchitecture>
+    <TargetArchitecture Condition="'$(Platform)' == 'x86' Or '$(Platform)' == 'Win32'">x86</TargetArchitecture>
+
+    <ExecutablePath>$(VisualCppTools)\lib\native\bin\$(HostArchitecture)\$(TargetArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(VisualCppTools)\lib\native\include;$(WindowsSDKHeaders)\inc\coresdk;$(IncludePath)</IncludePath>
+
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>OFFICEDEV_DONT_POLLUTE_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SupportJustMyCode>false</SupportJustMyCode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+</Project>

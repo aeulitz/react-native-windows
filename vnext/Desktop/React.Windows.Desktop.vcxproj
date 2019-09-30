@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.props')" />
+  <Import Project="..\packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.props" Condition="'$(NoCppWinRT)' == '' And Exists('..\packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -66,14 +66,12 @@
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(ReactNativeWindowsDir)\PropertySheets\ReactCommunity.cpp.props" />
-  <ItemGroup>
+  <ItemGroup Condition="'$(NoCppWinRT)' == ''">
     <Midl Include="ABI\MemoryTracker.idl" />
     <Midl Include="ABI\MessageQueue.idl" />
     <Midl Include="ABI\NativeLogging.idl" />
     <Midl Include="ABI\NativeTracing.idl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ABI\MemoryTracker.cpp">
+    <ClCompile Include="ABI\MemoryTracker.cpp" >
       <DependentUpon>ABI\MemoryTracker.idl</DependentUpon>
       <ObjectFileName>$(IntDir)\ABI\</ObjectFileName>
     </ClCompile>
@@ -89,6 +87,21 @@
       <DependentUpon>ABI\NativeTracing.idl</DependentUpon>
       <ObjectFileName>$(IntDir)\ABI\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
+    <ClInclude Include="ABI\MemoryTracker.h" >
+      <DependentUpon>ABI\MemoryTracker.idl</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="ABI\MessageQueueShim.h">
+      <DependentUpon>ABI\MessageQueue.idl</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="ABI\NativeLogEventSource.h">
+      <DependentUpon>ABI\NativeLogging.idl</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="ABI\NativeTraceEventSource.h">
+      <DependentUpon>ABI\NativeTracing.idl</DependentUpon>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="CxxReactWin32\JSBigString.cpp" />
     <ClCompile Include="DevSupportManager.cpp" />
     <ClCompile Include="Executors\WebSocketJSExecutor.cpp" />
@@ -107,21 +120,8 @@
     <ClCompile Include="Sandbox\SandboxJSExecutor.cpp" />
     <ClCompile Include="HttpResource.cpp" />
     <ClCompile Include="WebSocket.cpp" />
-    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ABI\MemoryTracker.h">
-      <DependentUpon>ABI\MemoryTracker.idl</DependentUpon>
-    </ClInclude>
-    <ClInclude Include="ABI\MessageQueueShim.h">
-      <DependentUpon>ABI\MessageQueue.idl</DependentUpon>
-    </ClInclude>
-    <ClInclude Include="ABI\NativeLogEventSource.h">
-      <DependentUpon>ABI\NativeLogging.idl</DependentUpon>
-    </ClInclude>
-    <ClInclude Include="ABI\NativeTraceEventSource.h">
-      <DependentUpon>ABI\NativeTracing.idl</DependentUpon>
-    </ClInclude>
     <ClInclude Include="DevSupportManager.h" />
     <ClInclude Include="Executors\WebSocketJSExecutor.h" />
     <ClInclude Include="LazyDevSupportManager.h" />
@@ -162,7 +162,7 @@
     <Import Project="$(SolutionDir)packages\boost_date_time-vc141.1.68.0.0\build\boost_date_time-vc141.targets" Condition="Exists('$(SolutionDir)packages\boost_date_time-vc141.1.68.0.0\build\boost_date_time-vc141.targets')" />
     <Import Project="$(SolutionDir)packages\Microsoft.ChakraCore.vc140.1.11.10\build\native\Microsoft.ChakraCore.vc140.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.ChakraCore.vc140.1.11.10\build\native\Microsoft.ChakraCore.vc140.targets')" />
     <Import Project="$(SolutionDir)packages\ChakraCore.Debugger.0.0.0.39\build\native\ChakraCore.Debugger.targets" Condition="Exists('$(SolutionDir)packages\ChakraCore.Debugger.0.0.0.39\build\native\ChakraCore.Debugger.targets')" />
-    <Import Project="$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
+    <Import Project="$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.targets" Condition="'$(NoCppWinRT)' == '' And Exists('$(SolutionDir)packages\Microsoft.Windows.CppWinRT.2.0.190506.1\build\native\Microsoft.Windows.CppWinRT.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

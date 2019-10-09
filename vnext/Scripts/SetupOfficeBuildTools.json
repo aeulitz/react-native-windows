@@ -11,7 +11,7 @@
 			"version": "14.13.26133.2",
 			"feed": "OfficeNugetFeed"
 		},
-		"Microsoft.VCCompiler.Headers.Office":{
+		"Microsoft.VCCompiler.Headers.Office.noolibc": {
 			"version": "14.13.26133.6",
 			"feed": "OfficeNugetFeed"
 		},

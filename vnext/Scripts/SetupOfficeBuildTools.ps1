@@ -114,7 +114,7 @@ function Install() {
 			Write-Host "done."
 
 			switch ($packageName) {
-				"Microsoft.VCCompiler.Headers.Office" { $officeHeadersPackage = $package }
+				"Microsoft.VCCompiler.Headers.Office.noolibc" { $officeHeadersPackage = $package }
 				"VisualCppTools.InternalAddCHPE.VS2017Layout" {$officeCompilerPackage = $package }
 			}
 		}

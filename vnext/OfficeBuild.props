@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AeuEasilyFindableString>kpax</AeuEasilyFindableString>
-    <AeuExecutablePath>$(ExecutablePath);$(AeuEasilyFindableString)</AeuExecutablePath>
+    <VC_VC_IncludePath>D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\include</VC_VC_IncludePath>
+    <VC_ATLMFC_IncludePath>D:\ISS\private-rnw\vnext\packages\VisualCppTools.InternalAddCHPE.VS2017Layout.14.13.26133.2\lib\native\atlmfc\include</VC_ATLMFC_IncludePath>
+    <UniversalCRT_IncludePath>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6\inc\ucrt</UniversalCRT_IncludePath>
+    <UM_IncludePath>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6\inc\coresdk</UM_IncludePath>
+    <KIT_SHARED_IncludePath>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6\inc\coresdk</KIT_SHARED_IncludePath>
+    <WinRT_IncludePath>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6\inc\rt</WinRT_IncludePath>
+    <CppWinRT_IncludePath>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6\inc\cppwinrt</CppWinRT_IncludePath>
+    <DotNetSdk_IncludePath>D:\ISS\private-rnw\vnext\packages\WindowsSDKHeaders.10.0.18847.6\inc\coresdk</DotNetSdk_IncludePath>
   </PropertyGroup>
 </Project>

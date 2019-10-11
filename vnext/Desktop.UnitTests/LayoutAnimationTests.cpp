@@ -39,7 +39,7 @@ constexpr auto c_springDampingSz = "springDamping";
 namespace Microsoft::VisualStudio::CppUnitTestFramework {
 
 template <>
-std::wstring ToString<enum facebook::react::LayoutAnimation::AnimationType>(
+std::wstring ToString<enum class facebook::react::LayoutAnimation::AnimationType>(
     const enum class facebook::react::LayoutAnimation::AnimationType &t) {
   switch (t) {
     case facebook::react::LayoutAnimation::AnimationType::Linear:
@@ -61,7 +61,7 @@ std::wstring ToString<enum facebook::react::LayoutAnimation::AnimationType>(
 
 template <>
 std::wstring
-ToString<enum facebook::react::LayoutAnimation::AnimatableProperty>(
+ToString<enum class facebook::react::LayoutAnimation::AnimatableProperty>(
     const enum class facebook::react::LayoutAnimation::AnimatableProperty &t) {
   switch (t) {
     case facebook::react::LayoutAnimation::AnimatableProperty::Opacity:

@@ -1,0 +1,35 @@
+{
+	"feeds": {
+		"OfficeNugetFeed": {
+			"url": "https://office.pkgs.visualstudio.com/_packaging/Office/nuget/v2"
+		}
+	},
+
+	"packages": {
+		"Compiler": {
+			"name": "VisualCppTools.InternalAddCHPE.VS2017Layout",
+			"version": "14.13.26133.2",
+			"feed": "OfficeNugetFeed"
+		},
+		"CompilerHeaders": {
+			"name": "Microsoft.VCCompiler.Headers.Office.noolibc",
+			"version": "14.13.26133.6",
+			"feed": "OfficeNugetFeed"
+		},
+		"SDKHeaders": {
+			"name": "WindowsSDKHeaders",
+			"version": "10.0.18847.6",
+			"feed": "OfficeNugetFeed"
+		},
+		"SDKTools":{
+			"name": "WindowsSDKTools",
+			"version": "10.0.18847.1",
+			"feed": "OfficeNugetFeed"
+		},
+		"SDKBin": {
+			"name": "WindowsSDKBin",
+			"version": "10.0.18847",
+			"feed": "OfficeNugetFeed"
+		}
+	}
+}

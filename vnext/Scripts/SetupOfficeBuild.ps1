@@ -22,7 +22,9 @@ param (
 	[ValidateSet('install', 'uninstall')]
 	[string] $Action = 'install',
 	[string] $Configuration = "",
-	[object[]] $FeedCredentials = $null
+	[object[]] $FeedCredentials = $null,
+	[switch] $UseNugetExe = $false,
+	[string] $NugetExe = "nuget"
 )
 
 <#
@@ -66,7 +68,7 @@ if ($ConfigData.packageTargetDirectory -eq $null) {
 	$ConfigData.packageTargetDirectory = "$ProjectRootDir\packages"
 }
 
-if ($FeedCredentials -ne $null) {
+if (!$UseNuget -and ($FeedCredentials -ne $null)) {
 	foreach ($feedCredential in $FeedCredentials) {
 		$feed, $pat = $feedCredential
 		$ConfigData.feeds[$feed].pat = $pat
@@ -80,6 +82,26 @@ $BuildTargetsFileName = "$ProjectRootDir\_OfficeBuild.targets"
 $BuildScriptFileName = "$ProjectRootDir\_OfficeBuild.ps1"
 
 #endregion
+
+#region NuGet helpers
+
+function EmitPackageConfig($Packages) {
+	$packageConfigFile = "$($env:TEMP)\packages.config"
+	if (Test-Path $packageConfigFile) { Remove-Item $packageConfigFile }
+
+@"
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+$(
+	foreach ($k in $Packages.Keys) {
+		"  <package id=`"$($Packages[$k].name)`" version=`"$($Packages[$k].requestedVersion)`" />`n"
+	}
+)
+</packages>
+"@ | Out-File -FilePath $packageConfigFile -Encoding ascii
+
+	return $packageConfigFile
+}
 
 function InstallNugetPackage(
 	[string] $Name,
@@ -133,25 +155,53 @@ function UnregisterFeeds() {
 	}
 }
 
-function Install() {
-	RegisterFeeds
-	try {
-		foreach ($packageKey in $ConfigData.packages.Keys) {
-			$pi = $ConfigData.packages[$packageKey]
+#endregion
 
-			Write-Host "Installing package $($pi.name) $($pi.version) ... " -NoNewline
-			$pi.package = InstallNugetPackage -Name $pi.name -Version $pi.version -Feed $pi.feed -Credential $ConfigData.feeds[$pi.feed].credential
-			$pi.directory = GetNugetPackageInstallDir $pi.package
-			Write-Host "done."
+function Install() {
+	if ($UseNugetExe) {
+
+		$packageConfigFile = EmitPackageConfig $ConfigData.packages
+		try {
+			& $NugetExe install $packageConfigFile -OutputDirectory $ConfigData.packageTargetDirectory
+		}
+		finally {
+			Remove-Item $packageConfigFile
 		}
 
-		FixUpHeaders $ConfigData.packages
-		EmitBuildPropsFile $ConfigData.packages
-		EmitBuildTargetsFile $ConfigData.packages
-		EmitOfficeBuildScript
-	} finally {
-		UnregisterFeeds
+		foreach($key in $ConfigData.packages.Keys) {
+			$packageInfo = $ConfigData.packages[$key]
+			$package = Get-Package -Name $packageInfo.name -AllVersions -Destination $ConfigData.packageTargetDirectory -ErrorAction SilentlyContinue
+
+			if ($package -eq $null) {
+				throw "failed to install `"$($packageInfo.name)`" package"
+			} elseif ($package -is [array]) {
+				throw "multiple `"$($packageInfo.name)`" packages"
+			}
+
+			$packageInfo.package = $package
+			$packageInfo.directory = GetNugetPackageInstallDir $package
+		}
+	} else {
+
+		RegisterFeeds
+		try {
+			foreach ($packageKey in $ConfigData.packages.Keys) {
+				$pi = $ConfigData.packages[$packageKey]
+
+				Write-Host "Installing package $($pi.name) $($pi.version) ... " -NoNewline
+				$pi.package = InstallNugetPackage -Name $pi.name -Version $pi.version -Feed $pi.feed -Credential $ConfigData.feeds[$pi.feed].credential
+				$pi.directory = GetNugetPackageInstallDir $pi.package
+				Write-Host "done."
+			}
+		} finally {
+			UnregisterFeeds
+		}
 	}
+
+	FixUpHeaders $ConfigData.packages
+	EmitBuildPropsFile $ConfigData.packages
+	EmitBuildTargetsFile $ConfigData.packages
+	EmitOfficeBuildScript
 }
 
 function Uninstall() {

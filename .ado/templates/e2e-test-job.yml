@@ -1,9 +1,11 @@
 #
 parameters:
-  name: ""
+  name: ''
   pool:
-  BuildPlatform: "x86" # ARM, x86, x64
+  BuildPlatform: x86 # ARM, x86, x64
   UseRNFork: true
+  vsComponents: ''
+  vsInstallerUri: 'https://download.visualstudio.microsoft.com/download/pr/c4fef23e-cc45-4836-9544-70e213134bc8/1ee5717e9a1e05015756dff77eb27d554a79a6db91f2716d836df368381af9a1/vs_Enterprise.exe'
 
 jobs:
   - job: ${{ parameters.name }}
@@ -67,7 +69,15 @@ jobs:
         inputs:
           script: yarn build
 
-      - template: install-SDK.yml
+      - task: PowerShell@2
+        displayName: Install Visual Studio dependencies
+        inputs:
+          targetType: filePath
+          filePath: $(Build.SourcesDirectory)/vnext/Scripts/Tfs/Install-VsFeatures.ps1
+          arguments:
+            -InstallerUri ${{ parameters.vsInstallerUri }}
+            -Components ${{ parameters.vsComponents }}
+        condition: ne('${{parameters.vsComponents}}', '')
 
       - task: NuGetCommand@2
         displayName: NuGet restore - ReactUWPTestApp
@@ -85,9 +95,17 @@ jobs:
       - task: CmdLine@2
         displayName: run-windows
         inputs:
-          script: react-native run-windows --no-packager --arch ${{ parameters.BuildPlatform }} --release --bundle --logging --force
+          script: react-native run-windows --no-packager --arch ${{ parameters.BuildPlatform }} --release --bundle --logging
           workingDirectory: packages/E2ETest
 
+      - task: PublishBuildArtifacts@1
+        condition:  succeededOrFailed()
+        timeoutInMinutes: 10
+        inputs:    
+          pathtoPublish: packages/E2ETest/msbuild.binlog 
+          artifactName: 'ReactUWPTestApp build log' 
+          publishLocation: 'Container'
+                    
       # Wait for app to launch. A workaround to avoid WinAppDriver error: Failed to locate opened application window with appId
       - task: PowerShell@2
         displayName: Wait for app to launch
@@ -95,6 +113,12 @@ jobs:
           targetType: inline # filePath | inline
           script: |
             Start-Sleep -Seconds 30
+
+      - task: PowerShell@2
+        displayName: 'Check TestApp'
+        inputs:
+          targetType: 'inline'
+          script: 'if ((Get-Process React*) -eq $Null) { echo "TestApp is not running"; exit 1}'
 
       - task: CmdLine@2
         displayName: run test

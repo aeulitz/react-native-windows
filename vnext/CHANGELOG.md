@@ -1,7 +1,133 @@
 # Change Log - react-native-windows
 
-This log was last generated on Tue, 08 Oct 2019 18:33:16 GMT and should not be manually modified.
+This log was last generated on Wed, 23 Oct 2019 20:38:22 GMT and should not be manually modified.
 
+## 0.60.0-vnext.42
+Wed, 23 Oct 2019 20:38:22 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.11 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.41
+Tue, 22 Oct 2019 03:28:58 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.9 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.40
+Tue, 22 Oct 2019 01:01:42 GMT
+
+### Changes
+
+- Fix build issue with react-native run-windows (kmelmon@microsoft.com)
+## 0.60.0-vnext.39
+Fri, 18 Oct 2019 21:22:01 GMT
+
+### Changes
+
+- Fix run-windows app installation hang (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.38
+Fri, 18 Oct 2019 20:36:35 GMT
+
+### Changes
+
+- add developer menu property (kmelmon@microsoft.com)
+## 0.60.0-vnext.37
+Thu, 17 Oct 2019 23:10:13 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.8 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.36
+Thu, 17 Oct 2019 20:58:22 GMT
+
+### Changes
+
+- Fix two issues: 1) you cannot animated 2 subchannels of the same property with different animations. to fix this we animated yet another property set for translation and scale owned by the props nodes and use one animation to animate all of the subchannels for the uiElement. 2) Reference parameter names which started with a multi digit number are unsupported so i added an n to the start of each name, which was previously just the node's tag. (stpete@microsoft.com)
+## 0.60.0-vnext.35
+Thu, 17 Oct 2019 16:18:52 GMT
+
+### Changes
+
+- Support autoCapitalize Characters (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.34
+Thu, 17 Oct 2019 02:48:28 GMT
+
+### Changes
+
+- Support onSubmitEditing event (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.33
+Thu, 17 Oct 2019 00:14:32 GMT
+
+### Changes
+
+- exclude Generated Files (kmelmon@microsoft.com)
+## 0.60.0-vnext.32
+Wed, 16 Oct 2019 02:19:39 GMT
+
+### Changes
+
+- Extend flyout shadow fix to Popups (kenander@microsoft.com)
+## 0.60.0-vnext.31
+Tue, 15 Oct 2019 23:45:52 GMT
+
+### Changes
+
+- Reduced and simplified sample native modules (jthysell@microsoft.com)
+## 0.60.0-vnext.30
+Tue, 15 Oct 2019 22:35:30 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.7 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.29
+Tue, 15 Oct 2019 13:17:22 GMT
+
+### Changes
+
+- dont new up exceptions (adamgor@microsoft.com)
+## 0.60.0-vnext.28
+Mon, 14 Oct 2019 23:02:23 GMT
+
+### Changes
+
+- Microsoft.ReactNative attribute-based NativeModules (jthysell@microsoft.com)
+## 0.60.0-vnext.27
+Sat, 12 Oct 2019 16:49:47 GMT
+
+### Changes
+
+- add tests (kmelmon@microsoft.com)
+## 0.60.0-vnext.26
+Fri, 11 Oct 2019 22:15:37 GMT
+
+### Changes
+
+- add Common.vcxproj to CLI solutions (kmelmon@microsoft.com)
+## 0.60.0-vnext.25
+Fri, 11 Oct 2019 20:47:08 GMT
+
+### Changes
+
+- Support caretHidden (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.24
+Fri, 11 Oct 2019 10:21:12 GMT
+
+### Changes
+
+- add support for offline bundles (kmelmon@microsoft.com)
+## 0.60.0-vnext.23
+Wed, 09 Oct 2019 18:17:42 GMT
+
+### Changes
+
+- Add support for forever animations. (stpete@microsoft.com)
+## 0.60.0-vnext.22
+Wed, 09 Oct 2019 15:13:21 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.5 (53619745+rnbot@users.noreply.github.com)
 ## 0.60.0-vnext.21
 Tue, 08 Oct 2019 18:33:16 GMT
 

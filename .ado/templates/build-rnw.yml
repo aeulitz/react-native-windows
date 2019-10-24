@@ -9,7 +9,7 @@ parameters:
   msbuildVersion: 16.0
   msBuildArchitecture: x64
   preferredToolArchitecture: x64
-  platformToolset: v142
+  platformToolset: v141
   targetPlatformVersion: 10.0.18362.0
   msbuildArguments: ''
   yarnBuildCmd: build
@@ -56,6 +56,8 @@ steps:
       restoreDirectory: packages/
       verbosityRestore: Detailed # Options: quiet, normal, detailed
 
+  - template: install-SDK.yml
+
   - task: PowerShell@2
     displayName: Install Visual Studio dependencies
     inputs:
@@ -65,7 +67,7 @@ steps:
         -InstallerUri ${{ parameters.vsInstallerUri }}
         -Components ${{ parameters.vsComponents }}
         -Collect:$${{ parameters.debug }}
-    condition: ne('${{parameters.vsComponents}}', '')
+    condition: and(ne('${{parameters.vsComponents}}', ''), eq(variables['VmImage'], 'windows-2019'))
 
   - task: MSBuild@1
     displayName: MSBuild ${{parameters.project}}
@@ -75,7 +77,18 @@ steps:
       msbuildArchitecture: ${{parameters.msBuildArchitecture}}
       platform: $(BuildPlatform)
       configuration: $(BuildConfiguration)
+      createLogFile: true
+      logFileVerbosity: detailed
       msbuildArguments:
         /p:PreferredToolArchitecture=${{parameters.preferredToolArchitecture}}
         /p:PlatformToolset=${{parameters.platformToolset}}
         ${{parameters.msbuildArguments}}
+
+  - task: PublishBuildArtifacts@1
+    condition:  succeededOrFailed()
+    timeoutInMinutes: 10
+    inputs:    
+      pathtoPublish: $(Build.SourcesDirectory)/${{parameters.project}}.log 
+      artifactName: Detailed Logs for ${{parameters.project}} $(BuildConfiguration) $(BuildPlatform)
+      publishLocation: 'Container'
+

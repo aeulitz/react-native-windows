@@ -19,9 +19,9 @@
 #include <Windows.UI.Xaml.h>
 
 #include <Tracing.h>
+#include <Unicode.h>
 #include <cxxReact/Instance.h>
 #include <folly/dynamic.h>
-#include <unicode.h>
 #include <codecvt>
 
 #include <react-native-windows-extended.h>
@@ -227,6 +227,7 @@ std::shared_ptr<react::uwp::IReactInstance> HostingPane::getInstance() {
     react::uwp::ReactInstanceSettings settings;
     settings.UseWebDebugger = x_UseWebDebuggerCheckBox->IsChecked->Value;
     settings.UseLiveReload = x_UseLiveReloadCheckBox->IsChecked->Value;
+    settings.EnableDeveloperMenu = true;
     settings.LoggingCallback = [](facebook::react::RCTLogLevel logLevel,
                                   const char *message) {
       OutputDebugStringA("In LoggingCallback");
@@ -238,7 +239,7 @@ std::shared_ptr<react::uwp::IReactInstance> HostingPane::getInstance() {
         };
     m_instance->Start(m_instance, settings);
     m_instance->loadBundle(
-        facebook::react::unicode::utf16ToUtf8(m_loadedBundleFileName));
+        Microsoft::Common::Unicode::Utf16ToUtf8(m_loadedBundleFileName));
   }
   return m_instance;
 }

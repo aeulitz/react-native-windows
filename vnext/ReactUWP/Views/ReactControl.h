@@ -24,8 +24,7 @@ using namespace Windows::UI::Xaml::Media;
 namespace react {
 namespace uwp {
 
-class ReactControl : public std::enable_shared_from_this<ReactControl>,
-                     public IXamlReactControl {
+class ReactControl : public std::enable_shared_from_this<ReactControl>, public IXamlReactControl {
  public:
   ReactControl(IXamlRootView *parent, XamlView rootView);
 
@@ -58,6 +57,10 @@ class ReactControl : public std::enable_shared_from_this<ReactControl>,
  private:
   void HandleInstanceError();
   void HandleInstanceErrorOnUIThread();
+  void HandleInstanceWaiting();
+  void HandleInstanceWaitingOnUIThread();
+  void HandleDebuggerAttach();
+  void HandleDebuggerAttachOnUIThread();
   void PrepareXamlRootView(XamlView const &rootView);
   void EnsureFocusSafeHarbor();
   void InitializeDeveloperMenu();
@@ -72,8 +75,7 @@ class ReactControl : public std::enable_shared_from_this<ReactControl>,
   std::shared_ptr<facebook::react::NativeModuleProvider> m_moduleProvider;
   folly::dynamic m_initialProps;
   std::shared_ptr<TouchEventHandler> m_touchEventHandler;
-  std::shared_ptr<PreviewKeyboardEventHandlerOnRoot>
-      m_previewKeyboardEventHandlerOnRoot;
+  std::shared_ptr<PreviewKeyboardEventHandlerOnRoot> m_previewKeyboardEventHandlerOnRoot;
 
   int64_t m_rootTag = -1;
 
@@ -90,12 +92,14 @@ class ReactControl : public std::enable_shared_from_this<ReactControl>,
   bool m_isAttached{false};
   LiveReloadCallbackCookie m_liveReloadCallbackCookie{0};
   ErrorCallbackCookie m_errorCallbackCookie{0};
+  DebuggerAttachCallbackCookie m_debuggerAttachCallbackCookie{0};
 
   winrt::ContentControl m_focusSafeHarbor{nullptr};
-  winrt::ContentControl::LosingFocus_revoker
-      m_focusSafeHarborLosingFocusRevoker{};
+  winrt::ContentControl::LosingFocus_revoker m_focusSafeHarborLosingFocusRevoker{};
   winrt::Grid m_redBoxGrid{nullptr};
+  winrt::Grid m_greenBoxGrid{nullptr};
   winrt::TextBlock m_errorTextBlock{nullptr};
+  winrt::TextBlock m_waitingTextBlock{nullptr};
   winrt::Grid m_developerMenuRoot{nullptr};
   winrt::Button::Click_revoker m_remoteDebugJSRevoker{};
   winrt::Button::Click_revoker m_cancelRevoker{};
@@ -103,8 +107,7 @@ class ReactControl : public std::enable_shared_from_this<ReactControl>,
   winrt::Button::Click_revoker m_reloadJSRevoker{};
   winrt::Button::Click_revoker m_liveReloadRevoker{};
   winrt::Windows::UI::Core::CoreDispatcher m_uiDispatcher;
-  winrt::CoreDispatcher::AcceleratorKeyActivated_revoker
-      m_coreDispatcherAKARevoker{};
+  winrt::CoreDispatcher::AcceleratorKeyActivated_revoker m_coreDispatcherAKARevoker{};
 };
 
 } // namespace uwp

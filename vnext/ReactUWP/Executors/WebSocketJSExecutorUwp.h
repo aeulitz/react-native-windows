@@ -8,6 +8,7 @@
 #include <DevServerHelper.h>
 #include <cxxreact/JSExecutor.h>
 #include <cxxreact/JSModulesUnbundle.h>
+#include <cxxreact/MessageQueueThread.h>
 #pragma warning(pop)
 
 #include <WebSocketJSExecutorFactory.h>
@@ -47,21 +48,13 @@ class WebSocketJSExecutor : public facebook::react::JSExecutor {
       std::string &&bytecodeFileName
 #endif
       ) override;
-  virtual void setBundleRegistry(
-      std::unique_ptr<facebook::react::RAMBundleRegistry> bundleRegistry)
+  virtual void setBundleRegistry(std::unique_ptr<facebook::react::RAMBundleRegistry> bundleRegistry) override;
+  virtual void registerBundle(uint32_t bundleId, const std::string &bundlePath) override;
+  virtual void callFunction(const std::string &moduleId, const std::string &methodId, const folly::dynamic &arguments)
       override;
-  virtual void registerBundle(uint32_t bundleId, const std::string &bundlePath)
+  virtual void invokeCallback(const double callbackId, const folly::dynamic &arguments) override;
+  virtual void setGlobalVariable(std::string propName, std::unique_ptr<const facebook::react::JSBigString> jsonValue)
       override;
-  virtual void callFunction(
-      const std::string &moduleId,
-      const std::string &methodId,
-      const folly::dynamic &arguments) override;
-  virtual void invokeCallback(
-      const double callbackId,
-      const folly::dynamic &arguments) override;
-  virtual void setGlobalVariable(
-      std::string propName,
-      std::unique_ptr<const facebook::react::JSBigString> jsonValue) override;
   virtual void *getJavaScriptContext() override;
   virtual std::string getDescription() override;
 #ifdef WITH_JSC_MEMORY_PRESSURE
@@ -71,23 +64,25 @@ class WebSocketJSExecutor : public facebook::react::JSExecutor {
 
   winrt::Windows::Foundation::IAsyncAction ConnectAsync(
       const std::string &webSocketServerUrl,
-      const std::function<void(std::string)> &errorCallback);
+      const std::function<void(std::string)> &errorCallback,
+      const std::function<void()> &debuggerAttach,
+      const std::function<void()> &waitingForDebuggerCallback);
 
  private:
   enum class State {
     Disconnected,
     Connected, // Websocket is connected, still need to prepare the runtime.
+    Waiting, // Waiting for debugger to connect
     Running, // Runtime is running.
     Disposed, // Executor has been shutdown.
     Error
   };
 
  private:
-  bool PrepareJavaScriptRuntime();
+  bool PrepareJavaScriptRuntime(int milliseconds);
+  void PollPrepareJavaScriptRuntime();
   std::string Call(const std::string &methodName, folly::dynamic &arguments);
-  std::future<std::string> SendMessageAsync(
-      int requestId,
-      const std::string &message);
+  std::future<std::string> SendMessageAsync(int requestId, const std::string &message);
   void OnMessageReceived(const std::string &msg);
   void flush();
 
@@ -100,6 +95,9 @@ class WebSocketJSExecutor : public facebook::react::JSExecutor {
   bool IsRunning() const noexcept {
     return m_state == State::Running;
   }
+  bool IsWaiting() const noexcept {
+    return m_state == State::Waiting;
+  }
   bool IsInError() const noexcept {
     return m_state == State::Error;
   }
@@ -107,6 +105,8 @@ class WebSocketJSExecutor : public facebook::react::JSExecutor {
     return m_state == State::Disposed;
   }
   void OnHitError(std::string message);
+  void OnWaitingForDebugger();
+  void OnDebuggerAttach();
 
   const int ConnectTimeoutMilliseconds = 5000;
   const int ConnectRetryCount = 3;
@@ -117,10 +117,8 @@ class WebSocketJSExecutor : public facebook::react::JSExecutor {
   // WebSocket
   winrt::Windows::Networking::Sockets::MessageWebSocket m_socket;
   winrt::Windows::Storage::Streams::DataWriter m_socketDataWriter;
-  winrt::Windows::Networking::Sockets::MessageWebSocket::MessageReceived_revoker
-      m_msgReceived;
-  winrt::Windows::Networking::Sockets::MessageWebSocket::Closed_revoker
-      m_closed;
+  winrt::Windows::Networking::Sockets::MessageWebSocket::MessageReceived_revoker m_msgReceived;
+  winrt::Windows::Networking::Sockets::MessageWebSocket::Closed_revoker m_closed;
 
   folly::dynamic m_injectedObjects = folly::dynamic::object;
 
@@ -129,6 +127,8 @@ class WebSocketJSExecutor : public facebook::react::JSExecutor {
 
   State m_state = State::Disconnected;
   std::function<void(std::string)> m_errorCallback;
+  std::function<void()> m_debuggerAttachCallback;
+  std::function<void()> m_waitingForDebuggerCallback;
 
   std::atomic<LONG> m_requestId{0};
 };

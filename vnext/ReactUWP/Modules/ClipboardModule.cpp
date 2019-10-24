@@ -6,7 +6,7 @@
 #include "ClipboardModule.h"
 
 #include <winrt/Windows.ApplicationModel.DataTransfer.h>
-#include "unicode.h"
+#include "Unicode.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4146)
@@ -36,15 +36,11 @@ std::map<std::string, folly::dynamic> ClipboardModule::getConstants() {
   return {};
 }
 
-std::vector<facebook::xplat::module::CxxModule::Method>
-ClipboardModule::getMethods() {
+std::vector<facebook::xplat::module::CxxModule::Method> ClipboardModule::getMethods() {
   return {
       Method(
           "setString",
-          [](folly::dynamic args) {
-            ClipboardModule::SetClipboardText(
-                facebook::xplat::jsArgAsString(args, 0));
-          }),
+          [](folly::dynamic args) { ClipboardModule::SetClipboardText(facebook::xplat::jsArgAsString(args, 0)); }),
       Method(
           "getString",
           [](folly::dynamic args, Callback cbSuccess, Callback cbFail) {
@@ -56,7 +52,7 @@ ClipboardModule::getMethods() {
 
 /*static*/ void ClipboardModule::SetClipboardText(const std::string &text) {
   winrt::Windows::ApplicationModel::DataTransfer::DataPackage data;
-  data.SetText(facebook::react::unicode::utf8ToUtf16(text));
+  data.SetText(Microsoft::Common::Unicode::Utf8ToUtf16(text));
   winrt::Windows::ApplicationModel::DataTransfer::Clipboard::SetContent(data);
 }
 
@@ -67,15 +63,13 @@ winrt::fire_and_forget GetClipboardTextAsync(
       winrt::Windows::ApplicationModel::DataTransfer::Clipboard::GetContent();
   try {
     std::wstring text = std::wstring(co_await data.GetTextAsync());
-    cbSuccess({facebook::react::unicode::utf16ToUtf8(text)});
+    cbSuccess({Microsoft::Common::Unicode::Utf16ToUtf8(text)});
   } catch (...) {
     cbFail({});
   }
 }
 
-/*static*/ void ClipboardModule::GetClipboardText(
-    const Callback &cbSuccess,
-    const Callback &cbFail) {
+/*static*/ void ClipboardModule::GetClipboardText(const Callback &cbSuccess, const Callback &cbFail) {
   GetClipboardTextAsync(cbSuccess, cbFail);
 }
 

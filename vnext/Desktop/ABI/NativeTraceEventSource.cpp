@@ -5,9 +5,9 @@
 #include "NativeTraceEventSource.g.cpp"
 
 #include <Tracing.h>
-#include <unicode.h>
+#include <Unicode.h>
 
-using namespace ::facebook::react::unicode;
+using namespace ::Microsoft::Common::Unicode;
 
 namespace winrt::facebook::react::implementation {
 namespace {
@@ -15,44 +15,33 @@ namespace {
 std::atomic<uint32_t> g_abiHandlerRegistrationCookie = 0;
 
 class InternalHandler : public ::facebook::react::INativeTraceHandler{
-  public : virtual void JSBeginSection(
-      const char *profileName,
-      const char *args) noexcept override{
-      g_abiHandler.JSBeginSection(utf8ToUtf16(profileName), utf8ToUtf16(args));
+  public : virtual void JSBeginSection(const char *profileName, const char *args) noexcept override{
+      g_abiHandler.JSBeginSection(Utf8ToUtf16(profileName), Utf8ToUtf16(args));
 } // namespace
 
 virtual void JSEndSection() noexcept override {
   g_abiHandler.JSEndSection();
 }
 
-virtual void JSBeginAsyncSection(
-    const char *profileName,
-    int cookie) noexcept override {
-  g_abiHandler.JSBeginAsyncSection(utf8ToUtf16(profileName), cookie);
+virtual void JSBeginAsyncSection(const char *profileName, int cookie) noexcept override {
+  g_abiHandler.JSBeginAsyncSection(Utf8ToUtf16(profileName), cookie);
 }
 
-virtual void JSEndAsyncSection(
-    const char *profileName,
-    int cookie) noexcept override {
-  g_abiHandler.JSEndAsyncSection(utf8ToUtf16(profileName), cookie);
+virtual void JSEndAsyncSection(const char *profileName, int cookie) noexcept override {
+  g_abiHandler.JSEndAsyncSection(Utf8ToUtf16(profileName), cookie);
 }
 
 virtual void JSCounter(const char *profileName, int value) noexcept override {
-  g_abiHandler.JSCounter(utf8ToUtf16(profileName), value);
+  g_abiHandler.JSCounter(Utf8ToUtf16(profileName), value);
 }
 
-virtual void NativeBeginSection(
-    const char *profileName,
-    const char *args) noexcept override {
-  g_abiHandler.NativeBeginSection(utf8ToUtf16(profileName), utf8ToUtf16(args));
+virtual void NativeBeginSection(const char *profileName, const char *args) noexcept override {
+  g_abiHandler.NativeBeginSection(Utf8ToUtf16(profileName), Utf8ToUtf16(args));
 }
 
-virtual void NativeEndSection(
-    const char *profileName,
-    const char *args,
-    std::chrono::nanoseconds duration) noexcept override {
-  g_abiHandler.NativeEndSection(
-      utf8ToUtf16(profileName), utf8ToUtf16(args), duration.count());
+virtual void
+NativeEndSection(const char *profileName, const char *args, std::chrono::nanoseconds duration) noexcept override {
+  g_abiHandler.NativeEndSection(Utf8ToUtf16(profileName), Utf8ToUtf16(args), duration.count());
 }
 
 private:
@@ -60,8 +49,7 @@ private:
 g_internalHandler;
 }
 
-uint32_t NativeTraceEventSource::InitializeTracing(
-    ::winrt::facebook::react::INativeTraceHandler const &handler) {
+uint32_t NativeTraceEventSource::InitializeTracing(::winrt::facebook::react::INativeTraceHandler const &handler) {
   g_abiHandler = handler;
   ::facebook::react::InitializeTracing(&g_internalHandler);
   return ++g_abiHandlerRegistrationCookie;

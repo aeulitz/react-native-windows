@@ -32,9 +32,6 @@ param (
 	[string] $BuildSolution = ""
 )
 
-# 2019-10-23 15:17 Test Repo Config
-# 2019-10-23 13:46 Test Repo Config
-
 #region Globals and Command-Line Argument Helper Methods
 
 <#

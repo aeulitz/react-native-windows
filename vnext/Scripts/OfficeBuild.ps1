@@ -1,34 +1,67 @@
 <#
 .SYNOPSIS
-Helper script to download and setup of packages to re-create the Office build environment for
-react-native-win32.dll.
+Helper script to automate the setup of Office build tool packages, and the build of
+react-native-win32.dll with these tools.
 
 .PARAMETER Action
-Specifies the action the script should perform. Valid values are 'install' and 'uninstall'. Both
-actions are governed by the information in the configuration file (see 'Configuration' parameter).
-An 'uninstall' needs to be run with the same configuration to undo the effects of a previous
-'install'.
+Specifies the action the script should perform. Valid values are 'install', 'uninstall' and 'build'.
+The 'install' and 'uninstall' actions are governed by the information in the configuration file
+(see 'Configuration' parameter).
+
+.PARAMETER BuildPlatform
+Target platform for 'build' action. Defaults to 'x64'.
+
+.PARAMETER BuildConfiguration
+Target configuration for 'build' action. Defaults to 'Debug'.
 
 .PARAMETER Configuration
 Path name of a JSON file containing information about the Office build environment packages.
-Optional. If omitted, the script attempts to use a co-located 'SetupOfficeBuild.json' file.
+Optional. If omitted, the script attempts to use a co-located 'OfficeBuild.json' file.
+
+.PARAMETER FeedCredentials
+List of pairs where the first pair item is a feed name (as specified in the configuration file) and
+the second pair item a credential object for the respective feed. Optional; unused when installing
+via nuget.exe (see 'UseNugetExe' parameter).
+
+.PARAMETER UseNugetExe
+If specified, the script installs via nuget.exe (otherwise, it installs via the PowerShell package
+management cmdlets). See 'NugetExe' parameter for nuget.exe locations.
+
+.PARAMETER NugetExe
+Path (including file name) of nuget.exe. If unspecified, "nuget" is expected to be found among the
+executable paths.
+
+.PARAMETER BuildSolution
+Solution (.sln) for 'build' action. Defaults to 'ReactWindows-Desktop.sln'.
 
 .DESCRIPTION
-A successful install will create an '_OfficeBuild.ps1' script that, when invoked, attempts to build
-react-native-win32.dll using the Office compiler and standard and SDK headers and libs. A regular
-build ("msbuild ReactWindows-Desktop.sln ...") should remain unaffected.
+This script is intended to improve binary compatibility of react-native-win32.dll and Office
+executables by building with the same headers and libraries while using the same compiler and
+linker. The intended workflow consists of several script invocations:
+- OfficeBuild install
+- OfficeBuild build [<platform1>] [<configuration1>]
+- OfficeBuild build [<platform2>] [<configuration1>]
+- OfficeBuild build ...
+- OfficeBuild uninstall
+
+As the 'install' action is idempotent and the 'build' action implies 'install', the explicit
+'install' call can be omitted.
 #>
 param (
 	[ValidateSet('install', 'uninstall', 'build', '_verifybuild')]
 	[string] $Action = 'install',
+
+	[ValidateSet('x64', 'x86')]
+	[string] $BuildPlatform = "x64",
+
+	[ValidateSet('Release', 'Debug')]
+	[string] $BuildConfiguration = "Debug",
 
 	[string] $Configuration = "",
 	[object[]] $FeedCredentials = $null,
 	[switch] $UseNugetExe = $false,
 	[string] $NugetExe = "nuget",
 
-	[string] $BuildPlatform = "x64",
-	[string] $BuildConfiguration = "debug",
 	[string] $BuildSolution = ""
 )
 
@@ -98,10 +131,6 @@ if ([string]::IsNullOrEmpty($BuildSolution)) {
 	$BuildSolution = "$ProjectRootDir\ReactWindows-Desktop.sln"
 }
 
-$BuildPropsFileName = "$env:TEMP\ReactNativeWindows-$ScriptName-Build.props"
-$BuildTargetsFileName = "$env:TEMP\ReactNativeWindows-$ScriptName-Build.targets"
-$BuildLogFile = "$env:TEMP\ReactNativeWindows-$ScriptName-Build-$BuildPlatform-$BuildConfiguration.log"
-
 #endregion
 
 #region Low-Level Helpers
@@ -116,7 +145,7 @@ function Assert ($condition, $message = $null) {
 
 #region NuGet Helpers
 
-function EmitPackageConfig($Packages, $PackageConfigFile) {
+function CreatePackageConfig($Packages, $PackageConfigFile) {
 @"
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
@@ -127,6 +156,8 @@ $(
 )
 </packages>
 "@ | Out-File -FilePath $PackageConfigFile -Encoding ascii
+
+	LogComment "created NuGet package configuration file `"$PackageConfigFile`""
 }
 
 function InstallNugetPackage(
@@ -140,6 +171,7 @@ function InstallNugetPackage(
 	if ($pkg -ne $null) { return $pkg }
 
 	Install-Package -Name $Name -RequiredVersion $Version -Source $Feed -Credential $Credential -Destination $TargetDir | Out-Null
+	LogComment "installed package $Name $Version"
 }
 
 function UninstallNugetPackage(
@@ -149,6 +181,7 @@ function UninstallNugetPackage(
 	$pkg = GetLocallyInstalledNugetPackage -Name $Name -Version $Version -Destination $TargetDir
 	if ($pkg -eq $null) { return }
 	Uninstall-Package -Name $Name -RequiredVersion $Version -Destination $TargetDir | Out-Null
+	LogComment "uninstalled package $Name $Version"
 }
 
 function GetLocallyInstalledNugetPackage(
@@ -201,7 +234,6 @@ function Log([LogMessageType] $Type, [string] $Message) {
 	} else {
 		switch ($Type) {
 			([LogMessageType]::Comment) {
-				Write-Host "$Message"
 				("{0,-14} COMMENT: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
 					Out-File -Append -Encoding ascii -FilePath $LogFile
 			}
@@ -263,6 +295,8 @@ function FixUpHeaders($Packages) {
 		return
 	}
 
+	Write-Host "Fixing headers ... " -NoNewline
+
 	# Super-impose headers from Microsoft.VCCompiler.Headers.Office onto
 	# VisualCppTools.InternalAddCHPE.VS2017Layout.
 	#
@@ -276,9 +310,20 @@ function FixUpHeaders($Packages) {
 	Copy-Item -Recurse -Force -Path "$headerPackageDir\lib\native\include\*" -Destination "$compilerPackageDir\lib\native\include"
 
 	New-Item $sentinel | Out-Null
+
+	Write-Host "done."
 }
 
-function EmitBuildPropsFile($Packages, $FileName) {
+function CreateExportDefinitionFile(
+	[string] $SourceFileName,
+	[string] $TargetFileName) {
+	assert (Test-Path $SourceFileName), "`"$SourceFileName`" export definition file can't be found."
+	Get-Content $SourceFileName | Where-Object {$_ -notmatch "WINRT_"} > $TargetFileName
+
+	LogComment "created export definition file `"$TargetFileName`""
+}
+
+function CreateBuildPropsFile($BuildPropsFileName, $Packages) {
 	$compilerPackageDir = GetNugetPackageInstallDir $Packages['Compiler']
 	$sdkHeadersPackageDir = GetNugetPackageInstallDir $Packages['SDKHeaders']
 
@@ -308,10 +353,12 @@ function EmitBuildPropsFile($Packages, $FileName) {
 		<DotNetSdk_IncludePath>$sdkHeadersPackageDir\inc\coresdk</DotNetSdk_IncludePath>
 	</PropertyGroup>
 </Project>
-"@ | Out-File -FilePath $FileName -Encoding ascii
+"@ | Out-File -FilePath $BuildPropsFileName -Encoding ascii
+
+	LogComment "created build properties file `"$BuildPropsFileName`""
 }
 	
-function EmitBuildTargetsFile($Packages, $FileName) {
+function CreateBuildTargetsFile($BuildTargetsFileName, $Packages, $ExportDefinitionFileBase) {
 	# It might seem unusual to set properties in a *.targets file, but - even if additive -
 	# $ExecutablePath assignments in the respective *.props file preclude assignments to the same
 	# property by the rest of the build system (i.e. the build system appears to make $ExecutablePath
@@ -348,9 +395,14 @@ function EmitBuildTargetsFile($Packages, $FileName) {
 		<Link>
 			<AdditionalOptions>%(AdditionalOptions) /verbose</AdditionalOptions>
 		</Link>
+		<Link Condition="'`$(MSBuildProjectName)' == 'React.Windows.Desktop.DLL'">
+			<ModuleDefinitionFile>$ExportDefinitionFileBase`$(TargetArchitecture).def</ModuleDefinitionFile>
+		</Link>
 	</ItemDefinitionGroup>
 </Project>
-"@ | Out-File -FilePath $FileName -Encoding ascii
+"@ | Out-File -FilePath $BuildTargetsFileName -Encoding ascii
+
+	LogComment "created build targets file `"$BuildTargetsFileName`""
 }
 
 [string] $FileOrDirNamePattern = "[^\\/*?:]*"
@@ -585,14 +637,14 @@ function VerifyBuild($InstalledPackages, $BuildLogFile) {
 
 function Install() {
 	if ($UseNugetExe) {
+		# It seems nuget.exe requires the "packages.config" file name (other file names are being
+		# interpreted as package names).
 		$packageConfigFile = "$($env:TEMP)\packages.config"
-		EmitPackageConfig $ScriptConfigurationData.packages $packageConfigFile
-		try {
-			(& $NugetExe install $packageConfigFile -OutputDirectory $ScriptConfigurationData.packageTargetDirectory) | Out-Null
-		}
-		finally {
-			Remove-Item $packageConfigFile
-		}
+		CreatePackageConfig $ScriptConfigurationData.packages $packageConfigFile
+		Write-Host "Ensuring packages are installed ... " -NoNewline
+		(& $NugetExe install $packageConfigFile -OutputDirectory $ScriptConfigurationData.packageTargetDirectory) | Out-Null
+		Assert ($LASTEXITCODE -eq 0) "`"$NugetExe`" ended with a non-zero exit code"
+		Write-Host "done."
 	} else {
 
 		RegisterFeeds
@@ -625,28 +677,40 @@ function Uninstall() {
 	}
 }
 
-function Build() {
-	try {
-		PushLogDeferral
+function Build(
+	[string] $SolutionFileName,
+	[ValidateSet('x64', 'x86')][string] $Platform,
+	[ValidateSet('Release', 'Debug')][string] $Configuration) {
 
+	$originalExportDefinitionFileName = "$ProjectRootDir\Desktop.DLL\react-native-win32.$Platform.def"
+	$modifiedExportDefinitionFileBase = "$env:TEMP\ReactNativeWindows-$ScriptName-Build-"
+	$modifiedExportDefinitionFileName = "$modifiedExportDefinitionFileBase$Platform.def"
+	$propsFileName = "$env:TEMP\ReactNativeWindows-$ScriptName-Build.props"
+	$targetsFileName = "$env:TEMP\ReactNativeWindows-$ScriptName-Build.targets"
+	$logFileName = "$env:TEMP\ReactNativeWindows-$ScriptName-Build-$Platform-$Configuration.log"
+
+	PushLogDeferral
+	try {
 		# Build implies install
 		$installedPackages = Install
 
-		RemoveIfPresent $BuildTargetsFileName
-		RemoveIfPresent $BuildPropsFileName
-		RemoveIfPresent $BuildLogFile
+		CreateExportDefinitionFile $originalExportDefinitionFileName $modifiedExportDefinitionFileName
 
-		EmitBuildPropsFile $installedPackages $BuildPropsFileName
-		EmitBuildTargetsFile $installedPackages $BuildTargetsFileName
+		# Props and targets files are platform- and configuration-independent, their creation
+		# could be factored out of this function.
+		CreateBuildPropsFile $propsFileName $installedPackages
+		CreateBuildTargetsFile $targetsFileName $installedPackages $modifiedExportDefinitionFileBase
 
-		$buildCommand = "msbuild /v:diag /p:Platform=$BuildPlatform /p:Configuration=$BuildConfiguration /p:RNWBuildOverrideProps=$BuildPropsFileName /p:RNWBuildOverrideTargets=$BuildTargetsFileName /p:NoCppWinRT=true $BuildSolution > $BuildLogFile"
+		$buildCommand = "msbuild /v:diag /p:Platform=$Platform /p:Configuration=$Configuration /p:RNWBuildOverrideProps=$propsFileName /p:RNWBuildOverrideTargets=$targetsFileName /p:NoCppWinRT=true $SolutionFileName > $logFileName"
 		LogComment "build command `"$buildCommand`""
+		LogComment "build log in `"$logFileName`""
 
 		Write-Host "Building ..." -NoNewline
 		Invoke-Expression $buildCommand
+		Assert ($LASTEXITCODE -eq 0) "msbuild ended with a non-zero exit code"
 		Write-Host " done."
 
-		VerifyBuild $installedPackages $BuildLogFile
+		VerifyBuild $installedPackages $logFileName
 	} finally {
 		PopLogDeferral
 	}
@@ -659,12 +723,13 @@ function Build() {
 $startTime = Get-Date
 try {
 	switch ($Action) {
-		'install' { Install }
+		'install' { [void] (Install) }
 		'uninstall' { Uninstall }
-		'build' { Build }
+		'build' { Build $BuildSolution $BuildPlatform $BuildConfiguration }
 		'_verifybuild' {
 			$installedPackages = Install
-			VerifyBuild $installedPackages $BuildLogFile
+			$logFileName = "$env:TEMP\ReactNativeWindows-$ScriptName-Build-$BuildPlatform-$BuildConfiguration.log"
+			VerifyBuild $installedPackages $logFileName
 		}
 
 		default { throw "unexpected action $Action" }
@@ -673,6 +738,7 @@ try {
 	LogError "terminating due to critical error '$($_.Exception.Message)', trace $($_.Exception.StackTrace)"
 } finally {
 	Write-Host "errors: $ErrorCount, warnings: $WarningCount, total time: $((Get-Date) - $startTime)"
+	Write-Host "details in `"$LogFile`""
 	exit (0, 1)[$ErrorCount -gt 0]
 }
 

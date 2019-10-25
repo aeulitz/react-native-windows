@@ -1,7 +1,19 @@
 # Change Log - react-native-windows
 
-This log was last generated on Wed, 23 Oct 2019 20:38:22 GMT and should not be manually modified.
+This log was last generated on Thu, 24 Oct 2019 18:04:40 GMT and should not be manually modified.
 
+## 0.60.0-vnext.44
+Thu, 24 Oct 2019 18:04:40 GMT
+
+### Changes
+
+- fix assert/missing else when setting alignSelf to null (adamgor@microsoft.com)
+## 0.60.0-vnext.43
+Thu, 24 Oct 2019 09:06:03 GMT
+
+### Changes
+
+- Register 2x NYI stubs for NativeAnimatedModule (adamgor@microsoft.com)
 ## 0.60.0-vnext.42
 Wed, 23 Oct 2019 20:38:22 GMT
 

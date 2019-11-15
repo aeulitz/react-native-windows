@@ -2,6 +2,493 @@
   "name": "react-native-windows",
   "entries": [
     {
+      "date": "Thu, 14 Nov 2019 01:13:19 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.70",
+      "version": "0.60.0-vnext.70",
+      "comments": {
+        "none": [
+          {
+            "comment": "fix TextInput and Switch component colors",
+            "author": "robmeyer@microsoft.com",
+            "commit": "ab50b2508092d9faa2b796821dfbbf0f0847ed
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 12 Nov 2019 19:25:32 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.70",
+      "version": "0.60.0-vnext.70",
+      "comments": {
+        "none": [
+          {
+            "comment": "Do not eat exceptions in DevSupportManager::GetJavaScriptFromServer",
+            "author": "ngerlem@microsoft.com",
+            "commit": "3a2b9ba1261a52af4bd192a2d1121cd5962c2077"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 12 Nov 2019 04:50:06 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.70",
+      "version": "0.60.0-vnext.70",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.20",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "1799d42f737fc5fb31978c60a22a8dfd8c390719"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 12 Nov 2019 01:59:08 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.69",
+      "version": "0.60.0-vnext.69",
+      "comments": {
+        "none": [
+          {
+            "comment": "Native Mdoule documentation fixes",
+            "author": "jthysell@microsoft.com",
+            "commit": "35bfb6ede4d63b326b5b754642ac924217705327"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Mon, 11 Nov 2019 22:01:18 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.69",
+      "version": "0.60.0-vnext.69",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Workaround for flyout centering problem",
+            "author": "kenander@microsoft.com",
+            "commit": "b0defe86c05d88310fb66663be45dd925d3b3207"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Sat, 09 Nov 2019 01:27:15 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.68",
+      "version": "0.60.0-vnext.68",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Native Module Setup Guide * Added NativeModuleSetup.md, #3623 * Added link to new guide in NativeModules.md, ViewManagers.md * Updated ProjectStructure.md with Microsoft.ReactNative projects * Removed PropertySheets in SampleApps and CLI solutions",
+            "author": "jthysell@microsoft.com",
+            "commit": "91fc720c9220848107206d8a881ea269d444021f"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 08 Nov 2019 00:30:50 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.67",
+      "version": "0.60.0-vnext.67",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "ViewManager Command Updates * Added command to CustomUserControlViewManagerCPP, #3600 * Added support for simpler C# view manager commands signatures * Added support for object properties for view managers, #3613 * Added documentation for C++ view manager * Added documentation for ViewManager commands, #3599",
+            "author": "jthysell@microsoft.com",
+            "commit": "529a95bf145b1f25511874776724082ab8032caa"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 07 Nov 2019 17:37:11 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.66",
+      "version": "0.60.0-vnext.66",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Support refreshControl",
+            "author": "dida@ntdev.microsoft.com",
+            "commit": "7f7144f6708042a8e4983a143ef2733ac81abea5"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Wed, 06 Nov 2019 23:32:18 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.65",
+      "version": "0.60.0-vnext.65",
+      "comments": {
+        "none": [
+          {
+            "comment": "use  Microsoft.Windows.CppWinRT",
+            "author": "licanhua@live.com",
+            "commit": "1a49fbedd193735f47b6b6ad8359c901bd91a2bd"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Wed, 06 Nov 2019 13:58:14 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.65",
+      "version": "0.60.0-vnext.65",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Merging upstream changes",
+            "author": "anandrag@microsoft.com",
+            "commit": "4cc4f7fb88247740a117adcc4b3a0e094089e7a6"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Wed, 06 Nov 2019 06:59:22 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.64",
+      "version": "0.60.0-vnext.64",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.16",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "706fd405d978414e4c31ea3886412b2c74ecb526"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Wed, 06 Nov 2019 01:56:47 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.63",
+      "version": "0.60.0-vnext.63",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Native Modules: Updated samples and docs to show how to use events",
+            "author": "jthysell@microsoft.com",
+            "commit": "59da9ac5a77c1b25463093602b4f283d16f0f787"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 05 Nov 2019 23:11:52 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.62",
+      "version": "0.60.0-vnext.62",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "VM: Split up IViewManager into optional interfaces #3565",
+            "author": "jthysell@microsoft.com",
+            "commit": "e83fc2a2902ac5656667c720c8cbf90cea331cb6"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 01 Nov 2019 23:40:12 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.61",
+      "version": "0.60.0-vnext.61",
+      "comments": {
+        "none": [
+          {
+            "comment": "Move ScriptStore and RuntimeHolder to RNW.",
+            "author": "yicyao@microsoft.com",
+            "commit": "6a2c28a3e05f5026ef7c07f756a6393102cbd169"
+          }
+        ],
+        "prerelease": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.15",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "4988e4a8effa4b9d760410f6bead68e9f3f7555a"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 01 Nov 2019 21:25:27 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.60",
+      "version": "0.60.0-vnext.60",
+      "comments": {
+        "none": [
+          {
+            "comment": "Fix some nit suggestions from PR #3568.",
+            "author": "yicyao@microsoft.com",
+            "commit": "09b426a5bbf575ad23a721c50d0b374c84364b72"
+          }
+        ],
+        "prerelease": [
+          {
+            "comment": "Support snapToStart and snapToEnd for ScrollView",
+            "author": "dida@ntdev.microsoft.com",
+            "commit": "37662c94ca8556f3e63aeafbd474fabab71e40b4"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 01 Nov 2019 18:09:07 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.59",
+      "version": "0.60.0-vnext.59",
+      "comments": {
+        "none": [
+          {
+            "comment": "Implement ChakraRuntime::getPropertyNames() properly in native.",
+            "author": "yicyao@microsoft.com",
+            "commit": "7c96aa9beae65248b1b4c4c668b08ea56e4b4392"
+          }
+        ],
+        "prerelease": [
+          {
+            "comment": "Call native animation callbacks only once",
+            "author": "asklar@microsoft.com",
+            "commit": "141e2654c5b5ed958591c4933a82d85213b56e40"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 31 Oct 2019 18:11:20 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.58",
+      "version": "0.60.0-vnext.58",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.14",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "2ed89834a468e9c4cb1643e497661e7b70317c98"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 31 Oct 2019 16:59:45 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.57",
+      "version": "0.60.0-vnext.57",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Add todo stub for FacadeType::Progress in AnimatedNode",
+            "author": "adamgor@microsoft.com",
+            "commit": "ce0f4a3a91e31207d2aa1691cfb55d159457e5d0"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Wed, 30 Oct 2019 22:56:11 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.56",
+      "version": "0.60.0-vnext.56",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Set a default 3D perspective",
+            "author": "asklar@microsoft.com",
+            "commit": "8090b808b6696fe6d2323b260c88ec90ceedf2c8"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Wed, 30 Oct 2019 17:12:12 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.55",
+      "version": "0.60.0-vnext.55",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "fix build error",
+            "author": "enm10k@gmail.com",
+            "commit": "5d1b3c19e41fddac081dfa33d70785d80f20ddbc"
+          }
+        ],
+        "none": [
+          {
+            "comment": "Implement accessibilityAction",
+            "author": "licanhua@live.com",
+            "commit": "e931062bbaef57538e8e7ea06c6f1fb929f7b024"
+          },
+          {
+            "comment": "Enable IntegrationTestHarness",
+            "author": "licanhua@live.com",
+            "commit": "33e3543d4a36785b14a855fe748f4577e41dc0ad"
+          },
+          {
+            "comment": "Rename back to Build.ArtifactStagingDirectory.",
+            "author": "julio.rocha@microsoft.com",
+            "commit": "71aa1961c0c19d6b1bd6aade54011f5d9224a9d4"
+          },
+          {
+            "comment": "Removed boost_date_time from remaining projects.",
+            "author": "julio@rochsquadron.net",
+            "commit": "bedf8c8b9df6fb749a56bbb03968e7f92794bab7"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 29 Oct 2019 23:29:07 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.54",
+      "version": "0.60.0-vnext.54",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Fix crash in RS5 due to missing facade property",
+            "author": "asklar@winse.microsoft.com",
+            "commit": "1cd1d5fe48d2f304c5b1b4597c7a9930c76183ff"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 29 Oct 2019 19:36:34 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.53",
+      "version": "0.60.0-vnext.53",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Support Keyboard events",
+            "author": "dida@ntdev.microsoft.com",
+            "commit": "45a2fb84e8cbe53ad7ea190efab3919124ffb90b"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 29 Oct 2019 01:31:27 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.52",
+      "version": "0.60.0-vnext.52",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Update the CLI templates to use Microsoft.ReactNative",
+            "author": "jthysell@microsoft.com",
+            "commit": "45ae039458bf81794bd0b4d80fff18ffec4e347c"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Mon, 28 Oct 2019 23:51:07 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.51",
+      "version": "0.60.0-vnext.51",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Move closer to allowing JSI with OSS RN",
+            "author": "acoates@microsoft.com",
+            "commit": "80801ec6ff3272320e1d150483d3422ec9690b8f"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Sat, 26 Oct 2019 21:50:14 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.50",
+      "version": "0.60.0-vnext.50",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Fix remote debugger for Playground app. Now you can pass  the hostname:port of a running metro bundler instance and it will connect correctly",
+            "author": "asklar@winse.microsoft.com",
+            "commit": "3c510d99cb0db6b1fc371c589b6e97f94d85c8b5"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Sat, 26 Oct 2019 02:55:31 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.49",
+      "version": "0.60.0-vnext.49",
+      "comments": {
+        "none": [
+          {
+            "comment": "Upgrade to ChakraCore.Debugger 0.0.0.42.",
+            "author": "julio.rocha@microsoft.com",
+            "commit": "fe65a1039840af846610bbc174a9772f3d4ca8e5"
+          }
+        ],
+        "prerelease": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.13",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "d4b0d7291715673659e8490ef5ba8c1d65f26e56"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 25 Oct 2019 23:07:25 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.48",
+      "version": "0.60.0-vnext.48",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Custom View Managers E2E",
+            "author": "jthysell@microsoft.com",
+            "commit": "88cb2dc26682d9448ef07b15c94124ba07153594"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 25 Oct 2019 21:43:48 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.47",
+      "version": "0.60.0-vnext.47",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "go back to native implementation for getPropertyNames",
+            "author": "stecrain@microsoft.com",
+            "commit": "b3e7a4d358874e8a6f693c8dc84c3022c7d4d087"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 25 Oct 2019 20:56:10 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.46",
+      "version": "0.60.0-vnext.46",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.12",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "44da446020182a3f5ab3d0a499a909e61d11c52d"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 25 Oct 2019 01:44:45 GMT",
+      "tag": "react-native-windows_v0.60.0-vnext.45",
+      "version": "0.60.0-vnext.45",
+      "comments": {
+        "none": [
+          {
+            "comment": "Update Docs with VS Code launch config",
+            "author": "brkeyonz@microsoft.com",
+            "commit": "1df519266ddf300e9f8fd8948d2fb96e4d068546"
+          },
+          {
+            "comment": "Upgrade to ChakraCore.Debugger 0.0.0.41.",
+            "author": "julio@rochsquadron.net",
+            "commit": "c6427453fb5ef753ad38b872f04990c4d4cca679"
+          },
+          {
+            "comment": "Fix remaining JSI unit tests and some code clean up.",
+            "author": "yicyao@microsoft.com",
+            "commit": "1413e2f189dd7d59511c6220823c37c251b5de89"
+          }
+        ],
+        "prerelease": [
+          {
+            "comment": "make run-windows work on x86 machines",
+            "author": "asklar@winse.microsoft.com",
+            "commit": "280c71dbe5b34e13bb5012d35446324e1df1b039"
+          }
+        ]
+      }
+    },
+    {
       "date": "Thu, 24 Oct 2019 18:04:40 GMT",
       "tag": "react-native-windows_v0.60.0-vnext.44",
       "version": "0.60.0-vnext.44",

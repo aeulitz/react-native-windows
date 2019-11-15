@@ -64,7 +64,7 @@ class ChakraObjectRef {
 
   enum class State { Uninitialized, Initialized, Invalidated };
 
-  JsRef m_ref = nullptr;
+  JsRef m_ref = JS_INVALID_REFERENCE;
   State m_state = State::Uninitialized;
 };
 
@@ -148,7 +148,7 @@ ChakraObjectRef ToJsString(const std::string_view &utf8);
 ChakraObjectRef ToJsString(const std::wstring_view &utf16);
 
 /**
- * @param jsValue A ChakraObjectRef mananing a JsValueRef.
+ * @param jsValue A ChakraObjectRef managing a JsValueRef.
  *
  * @returns A ChakraObjectRef managing the return value of the JS .toString
  * function.
@@ -156,38 +156,16 @@ ChakraObjectRef ToJsString(const std::wstring_view &utf16);
 ChakraObjectRef ToJsString(const ChakraObjectRef &jsValue);
 
 /**
+ * @param jsNumber A ChakraObjectRef managing a JS number.
+ *
+ * @returns The value of jsNumber converted to an integer.
+ */
+int ToInteger(const ChakraObjectRef &jsNumber);
+
+/**
  * @returns A ChakraObjectRef managing a JS number.
  */
 ChakraObjectRef ToJsNumber(int num);
-
-/**
- * @returns A ChakraObjectRef managing a JS Object.
- *
- * @remarks The returned Object is backed by data and keeps data alive till the
- * garbage collector finalizes it.
- */
-template <typename T>
-ChakraObjectRef ToJsObject(std::unique_ptr<T> &&data) {
-  if (!data) {
-    throw facebook::jsi::JSINativeException("Cannot create an external JS Object without backing data.");
-  }
-
-  JsValueRef obj = nullptr;
-  VerifyChakraErrorElseThrow(JsCreateExternalObject(
-      data.get(),
-      [](void *dataToDestroy) {
-        // We wrap dataToDestroy in a unique_ptr to avoid calling delete
-        // explicitly.
-        std::unique_ptr<T> wrapper{static_cast<T *>(dataToDestroy)};
-      },
-      &obj));
-
-  // We only call data.release() after JsCreateExternalObject succeeds.
-  // Otherwise, when JsCreateExternalObject fails and an exception is thrown,
-  // the buffer that data used to own will be leaked.
-  data.release();
-  return ChakraObjectRef(obj);
-}
 
 /**
  * @returns A ChakraObjectRef managing a JS ArrayBuffer.
@@ -196,6 +174,52 @@ ChakraObjectRef ToJsObject(std::unique_ptr<T> &&data) {
  * till the garbage collector finalizes it.
  */
 ChakraObjectRef ToJsArrayBuffer(const std::shared_ptr<const facebook::jsi::Buffer> &buffer);
+
+/**
+ * @returns A ChakraObjectRef managing a JS Object.
+ *
+ * @remarks The returned Object is backed by data and keeps data alive till the
+ * garbage collector finalizes it.
+ */
+template <typename T>
+ChakraObjectRef ToJsObject(const std::shared_ptr<T> &data) {
+  if (!data) {
+    throw facebook::jsi::JSINativeException("Cannot create an external JS Object without backing data.");
+  }
+
+  JsValueRef obj = nullptr;
+  auto dataWrapper = std::make_unique<std::shared_ptr<T>>(data);
+
+  // We allocate a copy of data on the heap, a shared_ptr which is deleted when
+  // the JavaScript garbage collecotr releases the created external Object. This
+  // ensures that data stays alive while the JavaScript engine is using it.
+  VerifyChakraErrorElseThrow(JsCreateExternalObject(
+      dataWrapper.get(),
+      [](void *dataToDestroy) {
+        // We wrap dataToDestroy in a unique_ptr to avoid calling delete
+        // explicitly.
+        std::unique_ptr<std::shared_ptr<T>> wrapper{static_cast<std::shared_ptr<T> *>(dataToDestroy)};
+      },
+      &obj));
+
+  // We only call dataWrapper.release() after JsCreateExternalObject succeeds.
+  // Otherwise, when JsCreateExternalObject fails and an exception is thrown,
+  // the memory that dataWrapper used to own will be leaked.
+  dataWrapper.release();
+  return ChakraObjectRef(obj);
+}
+
+/**
+ * @param object A ChakraObjectRef returned by ToJsObject.
+ *
+ * @returns The backing external data for object.
+ */
+template <typename T>
+const std::shared_ptr<T> &GetExternalData(const ChakraObjectRef &object) {
+  void *data;
+  VerifyChakraErrorElseThrow(JsGetExternalData(object, &data));
+  return *static_cast<std::shared_ptr<T> *>(data);
+}
 
 /**
  * @param jsValue1 A ChakraObjectRef managing a JsValueRef.
@@ -214,5 +238,12 @@ bool CompareJsValues(const ChakraObjectRef &jsValue1, const ChakraObjectRef &jsV
  * equal.
  */
 bool CompareJsPropertyIds(const ChakraObjectRef &jsPropId1, const ChakraObjectRef &jsPropId2);
+
+/**
+ * @brief Cause a JS Error to be thrown in the engine's current context.
+ *
+ * @param message The message of the JS Error thrown.
+ */
+void ThrowJsException(const std::string_view &message);
 
 } // namespace Microsoft::JSI

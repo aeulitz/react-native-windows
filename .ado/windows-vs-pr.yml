@@ -7,14 +7,8 @@ pr:
   - master
 
 variables:
-  # General / Default
-  VmImage: vs2017-win2016
-  MSBuildVersion: 16.0
-  MSBuildArchitecture: x64
-  MSBuildPreferredToolArchitecture: x64
-  MSBuildPlatformToolset: v141
-  TargetPlatformVersion: 10.0.18362.0
-  VsComponents: Microsoft.VisualStudio.Component.VC.v141.x86.x64
+  - template: variables/msbuild.yml
+  - template: variables/vs2017.yml
 
 jobs:
   - job: Setup
@@ -71,9 +65,9 @@ jobs:
         clean: false
         submodules: false
 
-      # #TODO: Remove
-      # - powershell: |
-      #     ls 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\Extensions\' -Name -Recurse -Include '*GoogleTest*'
+      - task: UseNode@1
+        inputs:
+          version: '10.x'
 
       - template: templates/build-rnw.yml
         parameters:
@@ -81,7 +75,6 @@ jobs:
           yarnBuildCmd: buildci
           project: vnext/ReactWindows-Universal.sln
           vsComponents: $(VsComponents),Microsoft.VisualStudio.Component.VC.v141.ARM
-          msbuildArguments:
 
       - template: templates/publish-build-artifacts-for-nuget.yml
         parameters:
@@ -89,6 +82,18 @@ jobs:
           layoutHeaders: eq('true', variables['LayoutHeaders'])
           contents: |
             ReactUWP\**
+
+      - task: DeleteFiles@1
+        displayName: Delete vnext/build folder
+        inputs:
+          SourceFolder: vnext/build
+          Contents: '**/*'
+
+      - task: DeleteFiles@1
+        displayName: Delete vnext/target folder
+        inputs:
+          SourceFolder: vnext/target
+          Contents: '**/*'
 
       - task: NuGetCommand@2
         displayName: NuGet restore - Playground
@@ -178,14 +183,16 @@ jobs:
     cancelTimeoutInMinutes: 5 # how much time to give 'run always even if cancelled tasks' before killing them
 
     variables:
-      Desktop.IntegrationTests.Filter: (FullyQualifiedName!~WebSocketJSExecutorIntegrationTest)&(FullyQualifiedName!=RNTesterIntegrationTests::WebSocket)&(FullyQualifiedName!~WebSocket)
-      GoogleTestAdapterPath: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\Extensions\drknwe51.xnq'
-      # VCTargetsPath: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\Microsoft\VC\v150'
+      Desktop.IntegrationTests.Filter: (FullyQualifiedName!~WebSocketJSExecutorIntegrationTest)&(FullyQualifiedName!~WebSocket)
 
     steps:
       - checkout: self
         clean: false
         submodules: false
+
+      - task: UseNode@1
+        inputs:
+          version: '10.x'
 
       - task: VisualStudioTestPlatformInstaller@1
         inputs:
@@ -195,8 +202,6 @@ jobs:
         parameters:
           yarnBuildCmd: buildci
           project: vnext/ReactWindows-Desktop.sln
-          platformToolset: v141
-          vsComponents: $(VsComponents)
           msbuildArguments:
             /p:RNW_PKG_VERSION_STR="Private Build"
             /p:RNW_PKG_VERSION="1000,0,0,0"
@@ -241,6 +246,7 @@ jobs:
           collectDumpOn: onAbortOnly
           vsTestVersion: toolsInstaller
           otherConsoleOptions: '/blame -- RunConfiguration.TestSessionTimeout=300000'
+        condition: and(succeeded(), ne(variables['BuildConfiguration'], 'Debug'))
 
       - task: VSTest@2
         displayName: List Desktop Integration Tests
@@ -314,6 +320,10 @@ jobs:
     pool:
       vmImage: $(VmImage)
     steps:
+      - task: UseNode@1
+        inputs:
+          version: '10.x'
+
       - template: templates/react-native-init.yml
         parameters:
           version: 0.60.6
@@ -398,6 +408,10 @@ jobs:
         submodules: recursive # set to 'true' for a single level of submodules or 'recursive' to get submodules of submodules
         persistCredentials: false # set to 'true' to leave the OAuth token in the Git config after the initial fetch
 
+      - task: UseNode@1
+        inputs:
+          version: '10.x'
+
       - task: PowerShell@2
         displayName: Download Winium
         inputs:
@@ -441,6 +455,8 @@ jobs:
           workingDirectory: current
 
       - template: templates\install-SDK.yml
+        parameters:
+          sdkVersion: $(Win10Version)
 
       - task: PowerShell@2
         displayName: Install Visual Studio dependencies

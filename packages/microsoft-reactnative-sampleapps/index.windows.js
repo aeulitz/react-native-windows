@@ -7,11 +7,22 @@ import React, { Component } from 'react';
 import {
   AppRegistry,
   Button,
+  findNodeHandle,
+  requireNativeComponent,
   StyleSheet,
   Text,
+  UIManager,
   View,
 } from 'react-native';
-import { NativeModules } from 'react-native';
+
+import { NativeModules, NativeEventEmitter } from 'react-native';
+
+// Creating event emitters
+const SampleModuleCSEmitter = new NativeEventEmitter(NativeModules.SampleModuleCS);
+const SampleModuleCPPEmitter = new NativeEventEmitter(NativeModules.SampleModuleCPP);
+
+const CustomUserControlCS = requireNativeComponent('CustomUserControlCS');
+const CustomUserControlCPP = requireNativeComponent('CustomUserControlCPP');
 
 var log = function(result) {
   console.log(result);
@@ -25,14 +36,28 @@ var getCallback = function(prefix) {
 };
 
 class SampleApp extends Component {
+  componentDidMount() {
+    this._TimedEventCSSub = SampleModuleCSEmitter.addListener('TimedEventCS', getCallback('SampleModuleCS.TimedEventCS() => '));
+    this._TimedEventCPPSub = SampleModuleCPPEmitter.addListener('TimedEventCPP', getCallback('SampleModuleCPP.TimedEventCPP() => '));
+  }
 
-  _onPressHandlerSMCS() {
+  componentWillUnmount() {
+    this._TimedEventCSSub.remove();
+    this._TimedEventCPPSub.remove();
+  }
+
+  onPressSampleModuleCS() {
+    log('SampleApp.onPressSampleModuleCS()');
+
     var numberArg = 42;
 
     // SampleModuleCS constants
 
     log(`SampleModuleCS.NumberConstant: ${NativeModules.SampleModuleCS.NumberConstant}`);
     log(`SampleModuleCS.StringConstant: ${NativeModules.SampleModuleCS.StringConstant}`);
+
+    log(`SampleModuleCS.NumberConstantViaProvider: ${NativeModules.SampleModuleCS.NumberConstantViaProvider}`);
+    log(`SampleModuleCS.StringConstantViaProvider: ${NativeModules.SampleModuleCS.StringConstantViaProvider}`);
 
     // SampleModuleCS method calls
 
@@ -53,15 +78,24 @@ class SampleApp extends Component {
 
     var promise2 = NativeModules.SampleModuleCS.ExplicitPromiseMethodWithArgs(numberArg);
     promise2.then(getCallback('SampleModuleCS.ExplicitPromiseMethodWithArgs then => ')).catch(getCallback('SampleModuleCS.ExplicitPromiseMethodWithArgs catch => '));
+
+    log('SampleModuleCS.SyncReturnMethod => ' + NativeModules.SampleModuleCS.SyncReturnMethod());
+
+    log('SampleModuleCS.SyncReturnMethodWithArgs => ' + NativeModules.SampleModuleCS.SyncReturnMethodWithArgs(numberArg));
   }
 
-  _onPressHandlerSMCPP() {
+  onPressSampleModuleCPP() {
+    log('SampleApp.onPressSampleModuleCPP()');
+
     var numberArg = 42;
 
     // SampleModuleCPP constants
 
     log(`SampleModuleCPP.NumberConstant: ${NativeModules.SampleModuleCPP.NumberConstant}`);
     log(`SampleModuleCPP.StringConstant: ${NativeModules.SampleModuleCPP.StringConstant}`);
+
+    log(`SampleModuleCPP.NumberConstantViaProvider: ${NativeModules.SampleModuleCPP.NumberConstantViaProvider}`);
+    log(`SampleModuleCPP.StringConstantViaProvider: ${NativeModules.SampleModuleCPP.StringConstantViaProvider}`);
 
     // SampleModuleCPP method calls
 
@@ -82,19 +116,60 @@ class SampleApp extends Component {
 
     var promise2 = NativeModules.SampleModuleCPP.ExplicitPromiseMethodWithArgs(numberArg);
     promise2.then(getCallback('SampleModuleCPP.ExplicitPromiseMethodWithArgs then => ')).catch(getCallback('SampleModuleCPP.ExplicitPromiseMethodWithArgs catch => '));
+
+    log('SampleModuleCPP.SyncReturnMethod => ' + NativeModules.SampleModuleCPP.SyncReturnMethod());
+
+    log('SampleModuleCPP.SyncReturnMethodWithArgs => ' + NativeModules.SampleModuleCPP.SyncReturnMethodWithArgs(numberArg));
+  }
+
+  onPressCustomUserControlCS() {
+    log('SampleApp.onPressCustomUserControlCS()');
+
+    var strArg = 'Hello World!';
+
+    if (this._CustomUserControlCSRef)
+    {
+      const tag = findNodeHandle(this._CustomUserControlCSRef);
+      log(`UIManager.dispatchViewManagerCommand(${tag}, CustomUserControlCS.CustomCommand, "${strArg}")`);
+      UIManager.dispatchViewManagerCommand(tag, UIManager.getViewManagerConfig('CustomUserControlCS').Commands.CustomCommand, strArg);
+    }
+  }
+
+  onPressCustomUserControlCPP() {
+    log('SampleApp.onPressCustomUserControlCPP()');
+
+    var strArg = 'Hello World!';
+
+    if (this._CustomUserControlCPPRef)
+    {
+      const tag = findNodeHandle(this._CustomUserControlCPPRef);
+      log(`UIManager.dispatchViewManagerCommand(${tag}, CustomUserControlCPP.CustomCommand, "${strArg}")`);
+      UIManager.dispatchViewManagerCommand(tag, UIManager.getViewManagerConfig('CustomUserControlCPP').Commands.CustomCommand, strArg);
+    }
   }
 
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          Welcome to React Native!
+          SampleApp
         </Text>
         <Text style={styles.instructions}>
-          To get started, edit index.windows.js
+          This app consumes custom Native Modules and View Managers.
         </Text>
-        <Button onPress={this._onPressHandlerSMCS} title="Call SampleModuleCS!" disabled={NativeModules.SampleModuleCS == null} />
-        <Button onPress={this._onPressHandlerSMCPP} title="Call SampleModuleCPP!" disabled={NativeModules.SampleModuleCPP == null} />
+
+        <Button onPress={() => { this.onPressSampleModuleCS(); }} title="Call SampleModuleCS!" disabled={NativeModules.SampleModuleCS == null} />
+        <Button onPress={() => { this.onPressSampleModuleCPP(); }} title="Call SampleModuleCPP!" disabled={NativeModules.SampleModuleCPP == null} />
+
+        <CustomUserControlCS style={styles.customcontrol} label="CustomUserControlCS!" ref={(ref) => { this._CustomUserControlCSRef = ref; }} />
+        <Button onPress={() => { this.onPressCustomUserControlCS(); }} title="Call CustomUserControlCS Commands!" />
+
+        <CustomUserControlCPP style={styles.customcontrol} label="CustomUserControlCPP!" ref={(ref) => { this._CustomUserControlCPPRef = ref; }} />
+        <Button onPress={() => { this.onPressCustomUserControlCPP(); }} title="Call CustomUserControlCPP Commands!" />
+
+        <Text style={styles.instructions}>
+          Hello from Microsoft!
+        </Text>
       </View>
     );
   }
@@ -116,6 +191,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  customcontrol: {
+    color: '#333333',
+    backgroundColor: '#006666',
+    width: 200,
+    height: 20,
+    margin: 10,
   },
 });
 

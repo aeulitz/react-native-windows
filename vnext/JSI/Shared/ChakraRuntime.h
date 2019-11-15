@@ -148,18 +148,14 @@ class ChakraRuntime : public facebook::jsi::Runtime {
 
 #pragma endregion Functions_inherited_from_Runtime
 
- public:
-  // These three functions only performs shallow copies.
-  facebook::jsi::Value ToJsiValue(ChakraObjectRef &&ref);
-  ChakraObjectRef ToChakraObjectRef(const facebook::jsi::Value &value);
-  std::vector<ChakraObjectRef> ToChakraObjectRefs(const facebook::jsi::Value *value, size_t count);
-
  protected:
   ChakraRuntimeArgs &runtimeArgs() {
     return m_args;
   }
 
  private:
+  void VerifyJsErrorElseThrow(JsErrorCode error);
+
   // ChakraPointerValue is needed for working with Facebook's jsi::Pointer class
   // and must only be used for this purpose. Every instance of
   // ChakraPointerValue should be allocated on the heap and be used as an
@@ -238,54 +234,56 @@ class ChakraRuntime : public facebook::jsi::Runtime {
     return static_cast<const ChakraPointerValue *>(getPointerValue(p))->GetRef();
   }
 
-  class HostObjectProxy {
-   public:
-    facebook::jsi::Value Get(const facebook::jsi::PropNameID &propNameId) {
-      return m_hostObject->get(m_runtime, propNameId);
-    }
+  // These three functions only performs shallow copies.
+  facebook::jsi::Value ToJsiValue(ChakraObjectRef &&ref);
+  ChakraObjectRef ToChakraObjectRef(const facebook::jsi::Value &value);
+  std::vector<ChakraObjectRef> ToChakraObjectRefs(const facebook::jsi::Value *value, size_t count);
 
-    void Set(const facebook::jsi::PropNameID &propNameId, const facebook::jsi::Value &value) {
-      m_hostObject->set(m_runtime, propNameId, value);
-    }
+  // Convenience functions for property access.
+  ChakraObjectRef GetProperty(const ChakraObjectRef &obj, const ChakraObjectRef &id);
 
-    std::vector<facebook::jsi::PropNameID> Enumerator() {
-      return m_hostObject->getPropertyNames(m_runtime);
-    }
+  inline ChakraObjectRef GetProperty(const ChakraObjectRef &obj, const char *const name) {
+    return GetProperty(obj, GetChakraObjectRef(createPropNameIDFromAscii(name, strlen(name))));
+  }
 
-    HostObjectProxy(ChakraRuntime &rt, const std::shared_ptr<facebook::jsi::HostObject> &hostObject)
-        : m_runtime(rt), m_hostObject(hostObject) {}
-    std::shared_ptr<facebook::jsi::HostObject> getHostObject() {
-      return m_hostObject;
-    }
+  // Since the function
+  //   Object::getProperty(Runtime& runtime, const char* name)
+  // causes mulitple copies of name, we do not want to use it when implementing
+  // ChakraRuntime methods. This function does the same thing as
+  // Object::getProperty, but without the extra overhead. This function is
+  // declared as const so that it can be used when implementing
+  // isHostFunction and isHostObject.
+  inline facebook::jsi::Value GetProperty(const facebook::jsi::Object &obj, const char *const name) const {
+    // We have to use const_casts here because ToJsiValue and GetProperty cannnot
+    // be marked as const.
+    return const_cast<ChakraRuntime *>(this)->ToJsiValue(
+        const_cast<ChakraRuntime *>(this)->GetProperty(GetChakraObjectRef(obj), name));
+  }
 
-   private:
-    ChakraRuntime &m_runtime;
-    std::shared_ptr<facebook::jsi::HostObject> m_hostObject;
-  };
+  // Host function helper
+  static JsValueRef CALLBACK HostFunctionCall(
+      JsValueRef callee,
+      bool isConstructCall,
+      JsValueRef *argumentsIncThis,
+      unsigned short argumentCountIncThis,
+      void *callbackState);
 
-  template <typename T>
-  class ObjectWithExternalData : public facebook::jsi::Object {
-   public:
-    static facebook::jsi::Object create(ChakraRuntime &runtime, std::unique_ptr<T> &&externalData);
-
-    static ObjectWithExternalData<T> fromExisting(ChakraRuntime &runtime, facebook::jsi::Object &&obj);
-
-   public:
-    T *getExternalData();
-    ObjectWithExternalData(const Runtime::PointerValue *value)
-        : Object(const_cast<Runtime::PointerValue *>(value)) {} // TODO :: const_cast
-
-    ObjectWithExternalData(ObjectWithExternalData &&other) = default;
-    ObjectWithExternalData &operator=(ObjectWithExternalData &&other) = default;
-  };
-
-  template <class T>
-  friend class ObjectWithExternalData;
-
-  void VerifyJsErrorElseThrow(JsErrorCode error);
-
-  facebook::jsi::Object createProxy(facebook::jsi::Object &&target, facebook::jsi::Object &&handler) noexcept;
-  facebook::jsi::Function createProxyConstructor() noexcept;
+  // Host object helpers; runtime must be referring to a ChakraRuntime.
+  static facebook::jsi::Value HostObjectGetTrap(
+      Runtime &runtime,
+      const facebook::jsi::Value & /*thisVal*/,
+      const facebook::jsi::Value *args,
+      size_t count);
+  static facebook::jsi::Value HostObjectSetTrap(
+      Runtime &runtime,
+      const facebook::jsi::Value & /*thisVal*/,
+      const facebook::jsi::Value *args,
+      size_t count);
+  static facebook::jsi::Value HostObjectOwnKeysTrap(
+      Runtime &runtime,
+      const facebook::jsi::Value & /*thisVal*/,
+      const facebook::jsi::Value *args,
+      size_t count);
   facebook::jsi::Object createHostObjectProxyHandler() noexcept;
 
   // Promise Helpers
@@ -331,12 +329,6 @@ class ChakraRuntime : public facebook::jsi::Runtime {
       const facebook::jsi::Buffer &scriptBuffer,
       const facebook::jsi::Buffer &serializedScriptBuffer,
       const std::string &sourceURL);
-  static JsValueRef CALLBACK HostFunctionCall(
-      JsValueRef callee,
-      bool isConstructCall,
-      JsValueRef *argumentsIncThis,
-      unsigned short argumentCountIncThis,
-      void *callbackState);
 
   static std::once_flag s_runtimeVersionInitFlag;
   static uint64_t s_runtimeVersion;
@@ -361,9 +353,6 @@ class ChakraRuntime : public facebook::jsi::Runtime {
   // These buffers back the external array buffers that we handover to
   // ChakraCore.
   std::vector<std::shared_ptr<const facebook::jsi::Buffer>> m_pinnedPreparedScripts;
-
-  static constexpr const char *const s_proxyGetHostObjectTargetPropName = "$$ProxyGetHostObjectTarget$$";
-  static constexpr const char *const s_proxyIsHostObjectPropName = "$$ProxyIsHostObject$$";
 
   std::string m_debugRuntimeName;
   int m_debugPort{0};

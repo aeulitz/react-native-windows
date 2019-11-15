@@ -1,7 +1,163 @@
 # Change Log - react-native-windows
 
-This log was last generated on Thu, 24 Oct 2019 18:04:40 GMT and should not be manually modified.
+This log was last generated on Tue, 12 Nov 2019 04:50:06 GMT and should not be manually modified.
 
+## 0.60.0-vnext.70
+Tue, 12 Nov 2019 04:50:06 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.20 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.69
+Mon, 11 Nov 2019 22:01:18 GMT
+
+### Changes
+
+- Workaround for flyout centering problem (kenander@microsoft.com)
+## 0.60.0-vnext.68
+Sat, 09 Nov 2019 01:27:15 GMT
+
+### Changes
+
+- Native Module Setup Guide * Added NativeModuleSetup.md, #3623 * Added link to new guide in NativeModules.md, ViewManagers.md * Updated ProjectStructure.md with Microsoft.ReactNative projects * Removed PropertySheets in SampleApps and CLI solutions (jthysell@microsoft.com)
+## 0.60.0-vnext.67
+Fri, 08 Nov 2019 00:30:50 GMT
+
+### Changes
+
+- ViewManager Command Updates * Added command to CustomUserControlViewManagerCPP, #3600 * Added support for simpler C# view manager commands signatures * Added support for object properties for view managers, #3613 * Added documentation for C++ view manager * Added documentation for ViewManager commands, #3599 (jthysell@microsoft.com)
+## 0.60.0-vnext.66
+Thu, 07 Nov 2019 17:37:11 GMT
+
+### Changes
+
+- Support refreshControl (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.65
+Wed, 06 Nov 2019 13:58:14 GMT
+
+### Changes
+
+- Merging upstream changes (anandrag@microsoft.com)
+## 0.60.0-vnext.64
+Wed, 06 Nov 2019 06:59:22 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.16 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.63
+Wed, 06 Nov 2019 01:56:47 GMT
+
+### Changes
+
+- Native Modules: Updated samples and docs to show how to use events (jthysell@microsoft.com)
+## 0.60.0-vnext.62
+Tue, 05 Nov 2019 23:11:52 GMT
+
+### Changes
+
+- VM: Split up IViewManager into optional interfaces #3565 (jthysell@microsoft.com)
+## 0.60.0-vnext.61
+Fri, 01 Nov 2019 23:40:12 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.15 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.60
+Fri, 01 Nov 2019 21:25:27 GMT
+
+### Changes
+
+- Support snapToStart and snapToEnd for ScrollView (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.59
+Fri, 01 Nov 2019 18:09:07 GMT
+
+### Changes
+
+- Call native animation callbacks only once (asklar@microsoft.com)
+## 0.60.0-vnext.58
+Thu, 31 Oct 2019 18:11:20 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.14 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.57
+Thu, 31 Oct 2019 16:59:45 GMT
+
+### Changes
+
+- Add todo stub for FacadeType::Progress in AnimatedNode (adamgor@microsoft.com)
+## 0.60.0-vnext.56
+Wed, 30 Oct 2019 22:56:11 GMT
+
+### Changes
+
+- Set a default 3D perspective (asklar@microsoft.com)
+## 0.60.0-vnext.55
+Wed, 30 Oct 2019 17:12:12 GMT
+
+### Changes
+
+- fix build error (enm10k@gmail.com)
+## 0.60.0-vnext.54
+Tue, 29 Oct 2019 23:29:07 GMT
+
+### Changes
+
+- Fix crash in RS5 due to missing facade property (asklar@winse.microsoft.com)
+## 0.60.0-vnext.53
+Tue, 29 Oct 2019 19:36:34 GMT
+
+### Changes
+
+- Support Keyboard events (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.52
+Tue, 29 Oct 2019 01:31:27 GMT
+
+### Changes
+
+- Update the CLI templates to use Microsoft.ReactNative (jthysell@microsoft.com)
+## 0.60.0-vnext.51
+Mon, 28 Oct 2019 23:51:07 GMT
+
+### Changes
+
+- Move closer to allowing JSI with OSS RN (acoates@microsoft.com)
+## 0.60.0-vnext.50
+Sat, 26 Oct 2019 21:50:14 GMT
+
+### Changes
+
+- Fix remote debugger for Playground app. Now you can pass  the hostname:port of a running metro bundler instance and it will connect correctly (asklar@winse.microsoft.com)
+## 0.60.0-vnext.49
+Sat, 26 Oct 2019 02:55:31 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.13 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.48
+Fri, 25 Oct 2019 23:07:25 GMT
+
+### Changes
+
+- Custom View Managers E2E (jthysell@microsoft.com)
+## 0.60.0-vnext.47
+Fri, 25 Oct 2019 21:43:48 GMT
+
+### Changes
+
+- go back to native implementation for getPropertyNames (stecrain@microsoft.com)
+## 0.60.0-vnext.46
+Fri, 25 Oct 2019 20:56:10 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.12 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.45
+Fri, 25 Oct 2019 01:44:45 GMT
+
+### Changes
+
+- make run-windows work on x86 machines (asklar@winse.microsoft.com)
 ## 0.60.0-vnext.44
 Thu, 24 Oct 2019 18:04:40 GMT
 

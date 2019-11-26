@@ -31,6 +31,9 @@ management cmdlets). See 'NugetExe' parameter for nuget.exe locations.
 Path (including file name) of nuget.exe. If unspecified, "nuget" is expected to be found among the
 executable paths.
 
+.PARAMETER ADOLog
+Optimizes log output for ADO build pipelines.
+
 .PARAMETER BuildSolution
 Solution (.sln) for 'build' action. Defaults to 'ReactWindows-Desktop.sln'.
 
@@ -59,8 +62,10 @@ param (
 
 	[string] $Configuration = "",
 	[object[]] $FeedCredentials = $null,
-	[switch] $UseNugetExe = $false,
-	[string] $NugetExe = "nuget",
+	[switch] $UseNugetExe = $true,
+	[string] $NugetExe = "nuget", # assume nuget.exe is on the path
+
+	[switch] $ADOLog = $false,
 
 	[string] $BuildSolution = ""
 )
@@ -105,8 +110,10 @@ function RemoveIfPresent($FileName) {
 $ScriptName = (Get-Item $PSCommandPath).BaseName
 $ProjectRootDir = Get-Item "$PSScriptRoot\.."
 
-$LogFile = "$env:TEMP\ReactNativeWindows-$ScriptName.log"
-RemoveIfPresent $LogFile
+if (!$ADOLog) {
+	$LogFile = "$env:TEMP\ReactNativeWindows-$ScriptName.log"
+	RemoveIfPresent $LogFile
+}
 
 $ErrorCount = 0
 $WarningCount = 0
@@ -234,19 +241,32 @@ function Log([LogMessageType] $Type, [string] $Message) {
 	} else {
 		switch ($Type) {
 			([LogMessageType]::Comment) {
-				("{0,-14} COMMENT: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
-					Out-File -Append -Encoding ascii -FilePath $LogFile
+				if ($ADOLog) {
+					# ADO prefixes message with time stamp
+					Write-Host $Message
+				} else {
+					("{0,-14} COMMENT: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
+						Out-File -Append -Encoding ascii -FilePath $LogFile
+				}
 			}
 			([LogMessageType]::Warning) {
 				Write-Host -ForegroundColor Yellow "WARNING: $Message"
-				("{0,-14} WARNING: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
-					Out-File -Append -Encoding ascii -FilePath $LogFile
+
+				if (!$ADOLog) {
+					("{0,-14} WARNING: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
+						Out-File -Append -Encoding ascii -FilePath $LogFile
+				}
+
 				++$Script:WarningCount
 			}
 			([LogMessageType]::Error) {
 				Write-Host -ForegroundColor Red "ERROR: $Message"
-				("{0,-14} ERROR: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
-					Out-File -Append -Encoding ascii -FilePath $LogFile
+
+				if (!$ADOLog) {
+					("{0,-14} ERROR: {1}" -f (Get-Date).ToString("HH:mm:ss.FFFFF"), $Message) |
+						Out-File -Append -Encoding ascii -FilePath $LogFile
+				}
+
 				++$Script:ErrorCount
 			}
 		}
@@ -738,7 +758,11 @@ try {
 	LogError "terminating due to critical error '$($_.Exception.Message)', trace $($_.Exception.StackTrace)"
 } finally {
 	Write-Host "errors: $ErrorCount, warnings: $WarningCount, total time: $((Get-Date) - $startTime)"
-	Write-Host "details in `"$LogFile`""
+
+	if (!$ADOLog) {
+		Write-Host "details in `"$LogFile`""
+	}
+
 	exit (0, 1)[$ErrorCount -gt 0]
 }
 

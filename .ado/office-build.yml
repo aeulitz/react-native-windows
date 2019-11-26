@@ -29,6 +29,7 @@ steps:
   displayName: Print Agent.ToolsDirectory
 
 - powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
+  continueOnError: true
   displayName: NuGetExeToolPath before NuGet task
 
 - task: NuGetCommand@2
@@ -40,6 +41,7 @@ steps:
     restoreSolution: '**/*.sln'
 
 - powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
+  continueOnError: true
   displayName: NuGetExeToolPath after NuGet task
 
 - task: PowerShell@2

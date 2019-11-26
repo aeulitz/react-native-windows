@@ -28,12 +28,19 @@ steps:
 - powershell: Write-Host "Agent.ToolsDirectory='$(Agent.ToolsDirectory)'"
   displayName: Print Agent.ToolsDirectory
 
+- powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
+  displayName: NuGetExeToolPath before NuGet task
+
 - task: NuGetCommand@2
   displayName: Dummy NuGet restore
+  continueOnError: true
   inputs:
     command: 'restore'
     feedsToUse: 'non_existing_find_nuget_path'
     restoreSolution: '**/*.sln'
+
+- powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
+  displayName: NuGetExeToolPath after NuGet task
 
 - task: PowerShell@2
   displayName: Build RNW via Office tools

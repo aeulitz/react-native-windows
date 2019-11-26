@@ -13,7 +13,7 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
-- powershell: ls env:
+- powershell: ls "env:"
   displayName: Print Environment
 
 - powershell: ls -directory "$env:Path" | %{$_.FullName}

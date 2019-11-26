@@ -13,11 +13,27 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
+- powershell: ls env:
+  displayName: Print Environment
+
+- powershell: ls -directory "$env:Path" | %{$_.FullName}
+  displayName: Print Path
+
 - powershell: ls -directory "$env:ProgramFiles" | %{$_.FullName}
   displayName: Print ProgramFile content
 
+- powershell: ls -directory "${env:ProgramFiles(x86)}" | %{$_.FullName}
+  displayName: Print ProgramFile-x86 content
+
 - powershell: Write-Host "Agent.ToolsDirectory='$(Agent.ToolsDirectory)'"
   displayName: Print Agent.ToolsDirectory
+
+- task: NuGetCommand@2
+  displayName: Dummy NuGet restore
+  inputs:
+    command: 'restore'
+    feedsToUse: 'non_existing_find_nuget_path'
+    restoreSolution: '**/*.sln'
 
 - task: PowerShell@2
   displayName: Build RNW via Office tools

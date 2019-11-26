@@ -16,7 +16,7 @@ steps:
 - powershell: ls "env:"
   displayName: Print Environment
 
-- powershell: ls -directory "$env:Path" | %{$_.FullName}
+- powershell: Write-Host "$env:Path"
   displayName: Print Path
 
 - powershell: ls -directory "$env:ProgramFiles" | %{$_.FullName}

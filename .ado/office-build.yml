@@ -28,17 +28,11 @@ steps:
 - powershell: Write-Host "Agent.ToolsDirectory='$(Agent.ToolsDirectory)'"
   displayName: Print Agent.ToolsDirectory
 
-- powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
-  continueOnError: true
-  displayName: NuGetExeToolPath before NuGet task
-
 - task: NuGetCommand@2
-  displayName: Dummy NuGet restore
+  displayName: Dummy NuGet tasktore
   continueOnError: true
   inputs:
-    command: 'restore'
-    feedsToUse: 'non_existing_find_nuget_path'
-    restoreSolution: '**/*.sln'
+    command: 'custom'
 
 - powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
   continueOnError: true
@@ -49,7 +43,7 @@ steps:
   inputs:
     targetType: filePath
     filePath: $(Build.SourcesDirectory)\vnext\Scripts\OfficeBuild.ps1
-    arguments: build -ADOLog
+    arguments: build -ADOLog -NugetExe $(NuGetExeToolPath)
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.

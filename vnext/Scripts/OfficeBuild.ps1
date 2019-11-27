@@ -662,8 +662,12 @@ function Install() {
 		$packageConfigFile = "$($env:TEMP)\packages.config"
 		CreatePackageConfig $ScriptConfigurationData.packages $packageConfigFile
 		Write-Host "Ensuring packages are installed ... " -NoNewline
-		(& $NugetExe install $packageConfigFile -OutputDirectory $ScriptConfigurationData.packageTargetDirectory)
+		$nugetOutput = &$NugetExe install $packageConfigFile -OutputDirectory $ScriptConfigurationData.packageTargetDirectory
 		# | Out-Null
+
+		Write-Host "<NuGetOut>"
+		Write-Host $nugetOutput
+		Write-Host "</NuGetOut>"
 		Assert ($LASTEXITCODE -eq 0) "`"$NugetExe`" ended with a non-zero exit code"
 		Write-Host "done."
 	} else {

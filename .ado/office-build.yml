@@ -32,7 +32,7 @@ steps:
 
 - task: NuGetAuthenticate@0
   inputs:
-   nuGetServiceConnections: AeulitzRNWexperiment
+    nuGetServiceConnections: AeulitzRNWexperiment
 
 - task: PowerShell@2
   displayName: Build RNW via Office tools

@@ -685,12 +685,13 @@ function Install() {
 		$packageConfigFile = "$($env:TEMP)\packages.config"
 		CreatePackageConfig $ScriptConfigurationData.packages $packageConfigFile
 		Write-Host "Ensuring packages are installed ... " -NoNewline
-		$nugetCommand = "&`"$NugetExe`" setapikey $APIKey -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`""
-		LogComment "NuGet command `"$nugetCommand`""
-		$nugetOutput = Invoke-Expression $nugetCommand
-		foreach ($line in $nugetOutput) { LogComment $line }
 
-		$nugetCommand = "&`"$NugetExe`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" $packageConfigFile -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
+		# $nugetCommand = "&`"$NugetExe`" setapikey $APIKey -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`""
+		# LogComment "NuGet command `"$nugetCommand`""
+		# $nugetOutput = Invoke-Expression $nugetCommand
+		# foreach ($line in $nugetOutput) { LogComment $line }
+
+		$nugetCommand = "&`"$NugetExe`" install -ApiKey $APIKey -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
 		LogComment "NuGet command `"$nugetCommand`""
 		$nugetOutput = Invoke-Expression $nugetCommand
 		foreach ($line in $nugetOutput) { LogComment $line }

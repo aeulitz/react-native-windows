@@ -10,21 +10,9 @@ pool:
   vmImage: vs2017-win2016
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- powershell: ls "env:"
-  displayName: Print Environment
-
 - task: NuGetToolInstaller@0
   inputs:
     versionSpec: "=4.6.0"
-
-- task: NuGetCommand@2
-  displayName: Dummy NuGet tasktore
-  continueOnError: true
-  inputs:
-    command: 'custom'
 
 - powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
   continueOnError: true

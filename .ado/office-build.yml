@@ -16,21 +16,9 @@ steps:
 - powershell: ls "env:"
   displayName: Print Environment
 
-- powershell: Write-Host "$env:Path"
-  displayName: Print Path
-
-- powershell: ls -directory "$env:ProgramFiles" | %{$_.FullName}
-  displayName: Print ProgramFile content
-
-- powershell: ls -directory "${env:ProgramFiles(x86)}" | %{$_.FullName}
-  displayName: Print ProgramFile-x86 content
-
-- powershell: Write-Host "Agent.ToolsDirectory='$(Agent.ToolsDirectory)'"
-  displayName: Print Agent.ToolsDirectory
-
 - task: NuGetToolInstaller@0
   inputs:
-    versionSpec: ">=4.6.0"
+    versionSpec: "=4.6.0"
 
 - task: NuGetCommand@2
   displayName: Dummy NuGet tasktore

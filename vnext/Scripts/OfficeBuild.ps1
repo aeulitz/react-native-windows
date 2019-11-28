@@ -222,7 +222,7 @@ function UnregisterFeeds() {
 
 #region Log Helpers
 
-enum LogMessageType { Comment; Warning; Error}
+enum LogMessageType { Comment; Warning; Error; File}
 
 [System.Collections.Stack] $LogDeferrals = [System.Collections.Stack]::new()
 
@@ -232,7 +232,16 @@ function PushLogDeferral() {
 
 function PopLogDeferral() {
 	$list = $LogDeferrals.Pop()
-	foreach ($entry in $list) { Log $entry.Type $entry.Message }
+	if ($LogDeferrals.Count -gt 0) {
+		[void] $LogDeferrals.Peek().AddRange($list)
+	} else {
+		foreach ($entry in $list) {
+			switch ($entry.Type) {
+				([LogMessageType]::File) { LogAppend $entry.FileName }
+				default { Log $entry.Type $entry.Message }
+			}
+		}
+	}
 }
 
 function Log([LogMessageType] $Type, [string] $Message) {
@@ -276,6 +285,19 @@ function Log([LogMessageType] $Type, [string] $Message) {
 function LogComment([string] $Message) { Log ([LogMessageType]::Comment) $Message }
 function LogWarning([string] $Message) { Log ([LogMessageType]::Warning) $Message }
 function LogError([string] $Message) { Log ([LogMessageType]::Error) $Message }
+
+function LogAppend($fileName) {
+	if ($LogDeferrals.Count -gt 0) {
+		[void] $LogDeferrals.Peek().Add(@{Type = [LogMessageType]::File; FileName = $fileName})
+	} else {
+
+		if ($ADOLog) {
+			Write-Host ((Get-Content $fileName) -join "`n")
+		} else {
+			Get-Content $fileName | Out-File -Append -Encoding ascii -FilePath $LogFile
+		}
+	}
+}
 
 #endregion
 
@@ -662,12 +684,11 @@ function Install() {
 		$packageConfigFile = "$($env:TEMP)\packages.config"
 		CreatePackageConfig $ScriptConfigurationData.packages $packageConfigFile
 		Write-Host "Ensuring packages are installed ... " -NoNewline
-		$nugetOutput = &$NugetExe install $packageConfigFile -OutputDirectory $ScriptConfigurationData.packageTargetDirectory
-		# | Out-Null
 
-		Write-Host "<NuGetOut>"
-		Write-Host $nugetOutput
-		Write-Host "</NuGetOut>"
+		$nugetCommand = "&`"$NugetExe`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" $packageConfigFile -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
+		LogComment "NuGet command `"$nugetCommand`""
+		$nugetOutput = Invoke-Expression $nugetCommand
+		foreach ($line in $nugetOutput) { LogComment $line }
 		Assert ($LASTEXITCODE -eq 0) "`"$NugetExe`" ended with a non-zero exit code"
 		Write-Host "done."
 	} else {
@@ -725,14 +746,14 @@ function Build(
 		# could be factored out of this function.
 		CreateBuildPropsFile $propsFileName $installedPackages
 		CreateBuildTargetsFile $targetsFileName $installedPackages $modifiedExportDefinitionFileBase
-
-		$buildCommand = "msbuild /v:diag /p:Platform=$Platform /p:Configuration=$Configuration /p:RNWBuildOverrideProps=$propsFileName /p:RNWBuildOverrideTargets=$targetsFileName /p:NoCppWinRT=true $SolutionFileName > $logFileName"
+		$buildCommand = "msbuild /v:diag /p:Platform=$Platform /p:Configuration=$Configuration /p:RNWBuildOverrideProps=$propsFileName /p:RNWBuildOverrideTargets=$targetsFileName /p:NoCppWinRT=true $SolutionFileName > `"$logFileName`""
 		LogComment "build command `"$buildCommand`""
-		LogComment "build log in `"$logFileName`""
-
 		Write-Host "Building ..." -NoNewline
-		Invoke-Expression $buildCommand
+		LogComment "build starting"
+		Invoke-Expression $buildCommand # diagnostic build output is too long to capture it as a list of lines
+		LogAppend $logFileName
 		Assert ($LASTEXITCODE -eq 0) "msbuild ended with a non-zero exit code"
+		LogComment "build finished"
 		Write-Host " done."
 
 		VerifyBuild $installedPackages $logFileName

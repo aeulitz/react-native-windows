@@ -28,6 +28,10 @@ steps:
 - powershell: Write-Host "Agent.ToolsDirectory='$(Agent.ToolsDirectory)'"
   displayName: Print Agent.ToolsDirectory
 
+- task: NuGetToolInstaller@0
+  inputs:
+    versionSpec: ">=4.6.0"
+
 - task: NuGetCommand@2
   displayName: Dummy NuGet tasktore
   continueOnError: true
@@ -43,7 +47,7 @@ steps:
   inputs:
     targetType: filePath
     filePath: $(Build.SourcesDirectory)\vnext\Scripts\OfficeBuild.ps1
-    arguments: build -ADOLog -NugetExe $(NuGetExeToolPath)
+    arguments: build -ADOLog -NugetExe $(NuGetExeToolPath) -APIKey z3teiygx364uapy4l3hf6lwwjrmzdvj5zuppcpiodyrjn6g3zljq
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.

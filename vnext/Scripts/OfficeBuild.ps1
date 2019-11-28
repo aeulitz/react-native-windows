@@ -67,7 +67,8 @@ param (
 
 	[switch] $ADOLog = $false,
 
-	[string] $BuildSolution = ""
+	[string] $BuildSolution = "",
+	[string] $APIKey
 )
 
 #region Globals and Command-Line Argument Helper Methods
@@ -685,7 +686,7 @@ function Install() {
 		CreatePackageConfig $ScriptConfigurationData.packages $packageConfigFile
 		Write-Host "Ensuring packages are installed ... " -NoNewline
 
-		$nugetCommand = "&`"$NugetExe`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" $packageConfigFile -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
+		$nugetCommand = "&`"$NugetExe`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" $packageConfigFile -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`" -apiKey $APIKey"
 		LogComment "NuGet command `"$nugetCommand`""
 		$nugetOutput = Invoke-Expression $nugetCommand
 		foreach ($line in $nugetOutput) { LogComment $line }

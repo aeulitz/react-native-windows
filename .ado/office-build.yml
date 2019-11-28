@@ -30,6 +30,10 @@ steps:
   continueOnError: true
   displayName: NuGetExeToolPath after NuGet task
 
+- task: NuGetAuthenticate@0
+  inputs:
+   nuGetServiceConnections: AeulitzRNWexperiment
+
 - task: PowerShell@2
   displayName: Build RNW via Office tools
   inputs:

@@ -12,13 +12,14 @@ pool:
 steps:
 - task: NuGetToolInstaller@0
   inputs:
-    versionSpec: "=4.6.0"
+    versionSpec: ">=4.6.0"
 
 - powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
   continueOnError: true
   displayName: NuGetExeToolPath after NuGet task
 
 - task: NuGetAuthenticate@0
+  continueOnError: true
   inputs:
     nuGetServiceConnections: AeulitzRNWexperiment
 

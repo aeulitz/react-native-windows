@@ -21,7 +21,7 @@ steps:
 - task: NuGetAuthenticate@0
   continueOnError: true
   inputs:
-    nuGetServiceConnections: AeulitzRNWexperiment
+    nuGetServiceConnections: OfficeNuGetFeed
 
 - task: PowerShell@2
   displayName: Build RNW via Office tools

@@ -21,13 +21,13 @@ Optional. If omitted, the script attempts to use a co-located 'OfficeBuild.json'
 .PARAMETER FeedCredentials
 List of pairs where the first pair item is a feed name (as specified in the configuration file) and
 the second pair item a credential object for the respective feed. Optional; unused when installing
-via nuget.exe (see 'UseNugetExe' parameter).
+via nuget.exe (see 'UseNuget' parameter).
 
-.PARAMETER UseNugetExe
+.PARAMETER UseNuget
 If specified, the script installs via nuget.exe (otherwise, it installs via the PowerShell package
-management cmdlets). See 'NugetExe' parameter for nuget.exe locations.
+management cmdlets). See 'NugetCmd' parameter for nuget.exe locations.
 
-.PARAMETER NugetExe
+.PARAMETER NugetCmd
 Path (including file name) of nuget.exe. If unspecified, "nuget" is expected to be found among the
 executable paths.
 
@@ -62,10 +62,12 @@ param (
 
 	[string] $Configuration = "",
 	[object[]] $FeedCredentials = $null,
-	[switch] $UseNugetExe = $true,
-	[string] $NugetExe = "nuget", # assume nuget.exe is on the path
+	[switch] $UseNuget = $true,
+	[string] $NugetCmd = "nuget", # assume nuget.exe is on the path
 
 	[switch] $ADOLog = $false,
+
+	[string] $MSBuildCmd = "msbuild", # assume msbuild.exe is on the path
 
 	[string] $BuildSolution = "",
 	[string] $APIKey
@@ -679,23 +681,23 @@ function VerifyBuild($InstalledPackages, $BuildLogFile) {
 #region User-Callable Actions
 
 function Install() {
-	if ($UseNugetExe) {
+	if ($UseNuget) {
 		# It seems nuget.exe requires the "packages.config" file name (other file names are being
 		# interpreted as package names).
 		$packageConfigFile = "$($env:TEMP)\packages.config"
 		CreatePackageConfig $ScriptConfigurationData.packages $packageConfigFile
 		Write-Host "Ensuring packages are installed ... " -NoNewline
 
-		# $nugetCommand = "&`"$NugetExe`" setapikey $APIKey -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`""
+		# $nugetCommand = "&`"$NugetCmd`" setapikey $APIKey -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`""
 		# LogComment "NuGet command `"$nugetCommand`""
 		# $nugetOutput = Invoke-Expression $nugetCommand
 		# foreach ($line in $nugetOutput) { LogComment $line }
 
-		$nugetCommand = "&`"$NugetExe`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
+		$nugetCommand = "&`"$NugetCmd`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
 		LogComment "NuGet command `"$nugetCommand`""
 		$nugetOutput = Invoke-Expression $nugetCommand
 		foreach ($line in $nugetOutput) { LogComment $line }
-		Assert ($LASTEXITCODE -eq 0) "`"$NugetExe`" ended with a non-zero exit code"
+		Assert ($LASTEXITCODE -eq 0) "`"$NugetCmd`" ended with a non-zero exit code"
 		Write-Host "done."
 	} else {
 
@@ -752,13 +754,13 @@ function Build(
 		# could be factored out of this function.
 		CreateBuildPropsFile $propsFileName $installedPackages
 		CreateBuildTargetsFile $targetsFileName $installedPackages $modifiedExportDefinitionFileBase
-		$buildCommand = "msbuild /v:diag /p:Platform=$Platform /p:Configuration=$Configuration /p:RNWBuildOverrideProps=$propsFileName /p:RNWBuildOverrideTargets=$targetsFileName /p:NoCppWinRT=true $SolutionFileName > `"$logFileName`""
+		$buildCommand = "&`"$MSBuildCmd`" /v:diag /p:Platform=$Platform /p:Configuration=$Configuration /p:RNWBuildOverrideProps=$propsFileName /p:RNWBuildOverrideTargets=$targetsFileName /p:NoCppWinRT=true $SolutionFileName > `"$logFileName`""
 		LogComment "build command `"$buildCommand`""
 		Write-Host "Building ..." -NoNewline
 		LogComment "build starting"
 		Invoke-Expression $buildCommand # diagnostic build output is too long to capture it as a list of lines
 		LogAppend $logFileName
-		Assert ($LASTEXITCODE -eq 0) "msbuild ended with a non-zero exit code"
+		Assert ($LASTEXITCODE -eq 0) "`"MSBuildCmd`" ended with a non-zero exit code"
 		LogComment "build finished"
 		Write-Host " done."
 

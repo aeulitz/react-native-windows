@@ -43,7 +43,7 @@ steps:
   inputs:
     targetType: filePath
     filePath: $(Build.SourcesDirectory)\vnext\Scripts\OfficeBuild.ps1
-    arguments: build -ADOLog -NugetExe $(NuGetExeToolPath) -APIKey z3teiygx364uapy4l3hf6lwwjrmzdvj5zuppcpiodyrjn6g3zljq
+    arguments: build -ADOLog -NugetCmd $(NuGetExeToolPath) -MSBuildCmd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.

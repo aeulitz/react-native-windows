@@ -691,7 +691,7 @@ function Install() {
 		# $nugetOutput = Invoke-Expression $nugetCommand
 		# foreach ($line in $nugetOutput) { LogComment $line }
 
-		$nugetCommand = "&`"$NugetExe`" install -ApiKey $APIKey -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
+		$nugetCommand = "&`"$NugetExe`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
 		LogComment "NuGet command `"$nugetCommand`""
 		$nugetOutput = Invoke-Expression $nugetCommand
 		foreach ($line in $nugetOutput) { LogComment $line }

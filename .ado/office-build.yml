@@ -34,7 +34,6 @@ steps:
   displayName: 'check env'
 
 - powershell: |
-    Write-Host "MSBuildPath='$(MSBuildPath)'"
     Write-Host "MSBuildLocation='$(MSBuildLocation)'"
   continueOnError: true
   displayName: MSBuildX variables after MSBuild task

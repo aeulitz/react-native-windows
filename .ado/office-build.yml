@@ -24,6 +24,8 @@ steps:
     nuGetServiceConnections: OfficeNuGetFeed
 
 - task: MSBuild@1
+  continueOnError: true
+  displayName: DummyMSBuild
   inputs:
     msbuildArguments: -help
 

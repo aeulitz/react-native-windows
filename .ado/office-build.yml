@@ -23,6 +23,14 @@ steps:
   inputs:
     nuGetServiceConnections: OfficeNuGetFeed
 
+- task: MSBuild@1
+  inputs:
+    msbuildArguments: -help
+
+- script: |
+    set
+  displayName: 'check env'
+
 - task: PowerShell@2
   displayName: Build RNW via Office tools
   inputs:

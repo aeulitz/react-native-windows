@@ -29,15 +29,6 @@ steps:
   inputs:
     msbuildArguments: -help
 
-- script: |
-    set
-  displayName: 'check env'
-
-- powershell: |
-    Write-Host "MSBuild='$(MSBuild)'"
-  continueOnError: true
-  displayName: MSBuildX variables after MSBuild task
-
 - task: PowerShell@2
   displayName: Build RNW via Office tools
   inputs:

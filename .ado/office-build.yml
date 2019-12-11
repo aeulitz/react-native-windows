@@ -33,6 +33,12 @@ steps:
     set
   displayName: 'check env'
 
+- powershell: |
+    Write-Host "MSBuildPath='$(MSBuildPath)'"
+    Write-Host "MSBuildLocation='$(MSBuildLocation)'"
+  continueOnError: true
+  displayName: MSBuildX variables after MSBuild task
+
 - task: PowerShell@2
   displayName: Build RNW via Office tools
   inputs:

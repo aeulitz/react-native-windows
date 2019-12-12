@@ -60,14 +60,16 @@ param (
 	[ValidateSet('Release', 'Debug')]
 	[string] $BuildConfiguration = "Debug",
 
+	[string] $PackageTargetDirectory = $null,
+
 	[string] $Configuration = "",
 	[object[]] $FeedCredentials = $null,
 	[switch] $UseNuget = $true,
-	[string] $NugetCmd = "nuget", # assume nuget.exe is on the path
+	[string] $NugetCmd = "nuget", # default value assumes nuget.exe is on the path
 
 	[switch] $ADOLog = $false,
 
-	[string] $MSBuildCmd = "msbuild", # assume msbuild.exe is on the path
+	[string] $MSBuildCmd = "msbuild", # default value assumes msbuild.exe is on the path
 
 	[string] $BuildSolution = "",
 	[string] $APIKey
@@ -126,9 +128,16 @@ if ([string]::IsNullOrEmpty($Configuration)) {
 }
 
 $ScriptConfigurationData = ConvertFromPSCustomObject (Get-Content $Configuration | ConvertFrom-Json)
-if ($ScriptConfigurationData.packageTargetDirectory -eq $null) {
-	$ScriptConfigurationData.packageTargetDirectory = "$ProjectRootDir\packages"
+
+if ([string]::IsNullOrEmpty($PackageTargetDirectory)) {
+	if ($ScriptConfigurationData.packageTargetDirectory -ne $null) {
+		$PackageTargetDirectory = $ScriptConfigurationData.packageTargetDirectory
+	} else {
+		$PackageTargetDirectory = "$ProjectRootDir\packages"
+	}
 }
+
+if (!(Test-Path $PackageTargetDirectory)) { [void](mkdir $PackageTargetDirectory) }
 
 if (!$UseNuget -and ($FeedCredentials -ne $null)) {
 	foreach ($feedCredential in $FeedCredentials) {
@@ -175,7 +184,7 @@ function InstallNugetPackage(
 	[string] $Version,
 	[string] $Feed,
 	$Credential,
-	$TargetDir = $ScriptConfigurationData.packageTargetDirectory) {
+	$TargetDir = $PackageTargetDirectory) {
 
 	$pkg = GetLocallyInstalledNugetPackage -Name $Name -Version $Version -Destination $TargetDir
 	if ($pkg -ne $null) { return $pkg }
@@ -187,7 +196,7 @@ function InstallNugetPackage(
 function UninstallNugetPackage(
 	[string] $Name,
 	[string] $Version,
-	[string] $TargetDir = $ScriptConfigurationData.packageTargetDirectory) {
+	[string] $TargetDir = $PackageTargetDirectory) {
 	$pkg = GetLocallyInstalledNugetPackage -Name $Name -Version $Version -Destination $TargetDir
 	if ($pkg -eq $null) { return }
 	Uninstall-Package -Name $Name -RequiredVersion $Version -Destination $TargetDir | Out-Null
@@ -197,7 +206,7 @@ function UninstallNugetPackage(
 function GetLocallyInstalledNugetPackage(
 	[string] $Name,
 	[string] $Version,
-	[string] $TargetDir = $ScriptConfigurationData.packageTargetDirectory) {
+	[string] $TargetDir = $PackageTargetDirectory) {
 	return (Get-Package -Name $Name -RequiredVersion $Version -Destination $TargetDir -ErrorAction SilentlyContinue)
 }
 
@@ -310,7 +319,7 @@ function GetInstalledPackages() {
 
 	foreach ($key in $ScriptConfigurationData.packages.Keys) {
 		$requestedPackage = $ScriptConfigurationData.packages[$key]
-		$installedPackage = Get-Package -Name $requestedPackage.name -AllVersions -Destination $ScriptConfigurationData.packageTargetDirectory -ErrorAction SilentlyContinue
+		$installedPackage = Get-Package -Name $requestedPackage.name -AllVersions -Destination $PackageTargetDirectory -ErrorAction SilentlyContinue
 
 		if ($installedPackage -eq $null) {
 			throw "could not find installed version of `"$($requestedPackage.name)`" package"
@@ -493,8 +502,8 @@ function VerifyBuild($InstalledPackages, $BuildLogFile) {
 	$officeCompilerCallCount = 0
 	$officeLinkerCallCount = 0
 
-	# Header and lib file paths rooted at this directory are considered 'legal'.
-	$legalInputBaseDir = Split-Path $ProjectRootDir
+	# Header and lib file paths rooted in these directories are considered 'legal'.
+	$legalInputBaseDirs = (Split-Path $ProjectRootDir), $PackageTargetDirectory
 
 	# Stack representing the project (.vcxproj) nesting structure.
 	$projectStack = [System.Collections.Stack]::new()
@@ -657,15 +666,25 @@ function VerifyBuild($InstalledPackages, $BuildLogFile) {
 			if (!(IsWhitelisted $project $projectWhitelist)) {
 
 				foreach ($header in $projectMap[$project].Headers) {
-					if (!$header.StartsWith($legalInputBaseDir, [System.StringComparison]::OrdinalIgnoreCase)) {
-						LogError "`"$header`" might be an illegal header"
+					$isLegal = $false
+					foreach($legalInputBaseDir in $legalInputBaseDirs) {
+						if ($header.StartsWith($legalInputBaseDir, [System.StringComparison]::OrdinalIgnoreCase)) {
+							$isLegal = $true
+							break
+						}
 					}
+					if (!$isLegal) { LogError "`"$header`" might be an illegal header" }
 				}
 
 				foreach ($lib in $projectMap[$project].Libs) {
-					if (!$lib.StartsWith($legalInputBaseDir, [System.StringComparison]::OrdinalIgnoreCase)) {
-						LogError "`"$lib`" might be an illegal link input"
+					$isLegal = $false
+					foreach($legalInputBaseDir in $legalInputBaseDirs) {
+						if ($lib.StartsWith($legalInputBaseDir, [System.StringComparison]::OrdinalIgnoreCase)) {
+							$isLegal = $true
+							break
+						}
 					}
+					if (!$isLegal) { LogError "`"$lib`" might be an illegal link input" }
 				}
 			}
 		}
@@ -693,7 +712,7 @@ function Install() {
 		# $nugetOutput = Invoke-Expression $nugetCommand
 		# foreach ($line in $nugetOutput) { LogComment $line }
 
-		$nugetCommand = "&`"$NugetCmd`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$($ScriptConfigurationData.packageTargetDirectory)`""
+		$nugetCommand = "&`"$NugetCmd`" install -Source `"$($ScriptConfigurationData.feeds.OfficeNugetFeed.url)`" `"$packageConfigFile`" -OutputDirectory `"$PackageTargetDirectory`""
 		LogComment "NuGet command `"$nugetCommand`""
 		$nugetOutput = Invoke-Expression $nugetCommand
 		foreach ($line in $nugetOutput) { LogComment $line }

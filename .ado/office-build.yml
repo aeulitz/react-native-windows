@@ -79,7 +79,7 @@ steps:
   inputs:
     targetType: filePath
     filePath: $(Build.SourcesDirectory)\vnext\Scripts\OfficeBuild.ps1
-    arguments: build -ADOLog -NugetCmd $(NuGetExeToolPath) -MSBuildCmd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe'
+    arguments: build -ADOLog -PackageTargetDirectory 'C:\RNWOfficeBuildPackages' -NugetCmd $(NuGetExeToolPath) -MSBuildCmd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe'
 
 - powershell: |
     Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"

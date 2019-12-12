@@ -23,11 +23,25 @@ steps:
   inputs:
     nuGetServiceConnections: OfficeNuGetFeed
 
-- task: MSBuild@1
-  continueOnError: true
-  displayName: DummyMSBuild
+- task: CmdLine@2
+  displayName: yarn install
   inputs:
-    msbuildArguments: -help
+    script: yarn install --frozen-lockfile
+
+- task: CmdLine@2
+  displayName: yarn build
+  inputs:
+    script: yarn build
+
+- task: NuGetCommand@2
+  displayName: NuGet restore
+  inputs:
+    command: restore
+    restoreSolution: vnext/ReactWindows-Desktop.sln
+    feedsToUse: config
+    nugetConfigPath: $(Build.SourcesDirectory)/vnext/NuGet.config
+    restoreDirectory: packages/
+    verbosityRestore: Detailed # Options: quiet, normal, detailed
 
 - task: PowerShell@2
   displayName: Build RNW via Office tools
@@ -36,7 +50,3 @@ steps:
     filePath: $(Build.SourcesDirectory)\vnext\Scripts\OfficeBuild.ps1
     arguments: build -ADOLog -NugetCmd $(NuGetExeToolPath) -MSBuildCmd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'

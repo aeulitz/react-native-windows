@@ -6,6 +6,10 @@
 trigger:
 - master
 
+variables:
+  - template: variables/msbuild.yml
+  - template: variables/vs2017.yml
+
 pool:
   vmImage: vs2017-win2016
 
@@ -66,6 +70,10 @@ steps:
     nugetConfigPath: $(Build.SourcesDirectory)/vnext/NuGet.config
     restoreDirectory: packages/
     verbosityRestore: Detailed # Options: quiet, normal, detailed
+
+- template: templates\install-SDK.yml
+  parameters:
+    sdkVersion: $(Win10Version)
 
 - powershell: |
     Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"

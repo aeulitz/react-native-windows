@@ -13,53 +13,28 @@ variables:
 pool:
   vmImage: vs2017-win2016
 
+# This step creates the NuGetExeToolPath variable passed into the Office build step below.
 steps:
-- powershell: |
-    Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"
-    Write-Host "D free: $( (Get-PSDrive 'D').Free/1GB ) GB"
-  continueOnError: true
-  displayName: Disk Space 1
-
 - task: NuGetToolInstaller@0
   inputs:
     versionSpec: ">=4.6.0"
 
-- powershell: Write-Host "NuGetExeToolPath='$(NuGetExeToolPath)'"
-  continueOnError: true
-  displayName: NuGetExeToolPath after NuGet task
-
+# This step establishes the credentials needed for the NuGet install step run as part of the Office
+# build step below.
 - task: NuGetAuthenticate@0
   continueOnError: true
   inputs:
     nuGetServiceConnections: OfficeNuGetFeed
-
-- powershell: |
-    Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"
-    Write-Host "D free: $( (Get-PSDrive 'D').Free/1GB ) GB"
-  continueOnError: true
-  displayName: Disk Space 2
 
 - task: CmdLine@2
   displayName: yarn install
   inputs:
     script: yarn install --frozen-lockfile
 
-- powershell: |
-    Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"
-    Write-Host "D free: $( (Get-PSDrive 'D').Free/1GB ) GB"
-  continueOnError: true
-  displayName: Disk Space 3
-
 - task: CmdLine@2
   displayName: yarn build
   inputs:
     script: yarn build
-
-- powershell: |
-    Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"
-    Write-Host "D free: $( (Get-PSDrive 'D').Free/1GB ) GB"
-  continueOnError: true
-  displayName: Disk Space 4
 
 - task: NuGetCommand@2
   displayName: NuGet restore
@@ -71,26 +46,50 @@ steps:
     restoreDirectory: packages/
     verbosityRestore: Detailed # Options: quiet, normal, detailed
 
+# Even though the Office build step should not consume any files installed with this step, it is
+# nevertheless needed to satisfy SDK checks performed by the MSBuild infrastructure engaged through
+# the Office build step below.
 - template: templates\install-SDK.yml
   parameters:
     sdkVersion: $(Win10Version)
 
+# For pipeline diagnostics, can be removed.
 - powershell: |
-    Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"
-    Write-Host "D free: $( (Get-PSDrive 'D').Free/1GB ) GB"
+    Write-Host "Free space on C drive: $((Get-PSDrive 'C').Free/1GB) GB"
+    Write-Host "Free space on D drive: $((Get-PSDrive 'D').Free/1GB) GB"
   continueOnError: true
-  displayName: Disk Space 5
+  displayName: Check free disk space
 
 - task: PowerShell@2
   displayName: Build RNW via Office tools
-  continueOnError: true
   inputs:
     targetType: filePath
     filePath: $(Build.SourcesDirectory)\vnext\Scripts\OfficeBuild.ps1
+    # The Office build packages collectively require about 9.25 GB. With the vs2017-win2016 images,
+    # we appear to operate on agents where the working drive (D:) has only about 11 GB of free space
+    # to begin with. With the "regular" RNW build dependency packages present, the installation of
+    # the Office build packages causes the working drive to run out of space.
+    # With 7.05 GB, VisualCppTools.InternalAddCHPE.VS2017Layout is the biggest offender among the
+    # Office build packages. According to Thomas Wise, this package is provided by DevDiv; we would
+    # have to ask them to split it up. Alternatively, we could attempt to remove unneeded parts
+    # after its installation. For now, we're working around the disk space limits by installing the
+    # Office build packages to the system rather than the working drive (-PackageTargetDirectory
+    # argument below).
     arguments: build -ADOLog -PackageTargetDirectory 'C:\RNWOfficeBuildPackages' -NugetCmd $(NuGetExeToolPath) -MSBuildCmd 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe'
 
-- powershell: |
-    Write-Host "C free: $( (Get-PSDrive 'C').Free/1GB ) GB"
-    Write-Host "D free: $( (Get-PSDrive 'D').Free/1GB ) GB"
-  continueOnError: true
-  displayName: Disk Space 6
+- task: VSTest@2
+  displayName: Run Desktop Unit Tests
+  timeoutInMinutes: 5 # Set smaller timeout, due to hangs
+  inputs:
+    testSelector: testAssemblies
+    testAssemblyVer2: |
+      React.Windows.Desktop.UnitTests/React.Windows.Desktop.UnitTests.dll
+      JSI.Desktop.UnitTests/JSI.Desktop.UnitTests.exe
+    pathtoCustomTestAdapters: $(GoogleTestAdapterPath)
+    searchFolder: $(Build.SourcesDirectory)/vnext/target/x64/Debug # $(Build.SourcesDirectory)/vnext/target/$(BuildPlatform)/$(BuildConfiguration)
+    runTestsInIsolation: true
+    platform: x64 # $(BuildPlatform)
+    configuration: Debug # $(BuildConfiguration)
+    publishRunAttachments: true
+    collectDumpOn: onAbortOnly
+    vsTestVersion: toolsInstaller

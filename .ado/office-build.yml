@@ -26,6 +26,19 @@ steps:
   inputs:
     nuGetServiceConnections: OfficeNuGetFeed
 
+# Even though the Office build step should not consume any files installed with this step, it is
+# nevertheless needed to satisfy SDK checks performed by the MSBuild infrastructure engaged through
+# the Office build step below.
+- template: templates\install-SDK.yml
+  parameters:
+    sdkVersion: $(Win10Version)
+
+# Needed for UT execution. Absence results in
+#   Error: VsTest Test Platform folder was not found in cache.
+- task: VisualStudioTestPlatformInstaller@1
+  inputs:
+    testPlatformVersion: 16.3.0
+
 - task: CmdLine@2
   displayName: yarn install
   inputs:
@@ -45,13 +58,6 @@ steps:
     nugetConfigPath: $(Build.SourcesDirectory)/vnext/NuGet.config
     restoreDirectory: packages/
     verbosityRestore: Detailed # Options: quiet, normal, detailed
-
-# Even though the Office build step should not consume any files installed with this step, it is
-# nevertheless needed to satisfy SDK checks performed by the MSBuild infrastructure engaged through
-# the Office build step below.
-- template: templates\install-SDK.yml
-  parameters:
-    sdkVersion: $(Win10Version)
 
 # For pipeline diagnostics, can be removed.
 - powershell: |

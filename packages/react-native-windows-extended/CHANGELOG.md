@@ -1,7 +1,61 @@
 # Change Log - react-native-windows-extended
 
-This log was last generated on Thu, 21 Nov 2019 01:46:31 GMT and should not be manually modified.
+This log was last generated on Thu, 30 Jan 2020 23:29:21 GMT and should not be manually modified.
 
+## 0.60.69-11
+Thu, 30 Jan 2020 23:29:21 GMT
+
+### Changes
+
+- Allow Any Prerelease Version 0f 0.60 as Peer Dependency (nick@nickgerleman.com)
+## 0.60.69-4
+Tue, 28 Jan 2020 18:08:35 GMT
+
+### Changes
+
+- Make the native build oblivous to the differences between microsoft/react-native and facebook/react-native with patches (nick@nickgerleman.com)
+## 0.60.68
+Fri, 24 Jan 2020 21:21:47 GMT
+
+### Patches
+
+- Update to react-native@0.60.0-microsoft.40 (acoates@microsoft.com)
+## 0.60.67
+Thu, 23 Jan 2020 00:16:13 GMT
+
+### Patches
+
+- Apply React Native Patches for All Consumers of ReackPackageDirectories (nick@nickgerleman.com)
+## 0.60.65
+Thu, 09 Jan 2020 23:20:10 GMT
+
+### Patches
+
+- Header Refactoring Around jsireact to Unblock ms/rn (nick@nickgerleman.com)
+## 0.60.43
+Thu, 12 Dec 2019 22:18:13 GMT
+
+### Patches
+
+- Updating react-native to version: 0.60.0-microsoft.31 (53619745+rnbot@users.noreply.github.com)
+## 0.60.37
+Fri, 06 Dec 2019 19:14:55 GMT
+
+### Patches
+
+- Updating react-native to version: 0.60.0-microsoft.28 (53619745+rnbot@users.noreply.github.com)
+## 0.60.36
+Fri, 06 Dec 2019 17:14:06 GMT
+
+### Patches
+
+- Updating react-native to version: 0.60.0-microsoft.26 (53619745+rnbot@users.noreply.github.com)
+## 0.60.33
+Mon, 02 Dec 2019 17:34:30 GMT
+
+### Patches
+
+- Updating react-native to version: 0.60.0-microsoft.24 (53619745+rnbot@users.noreply.github.com)
 ## 0.60.23
 Thu, 21 Nov 2019 01:46:31 GMT
 

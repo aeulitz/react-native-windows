@@ -1,17 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.ReactNative.Bridge
-{
-	interface IReactInstance
-	{
-    void InvokeFunction(String moduleName, String method, IVectorView<IInspectable> arguments);
-	};
+import "NoExceptionAttribute.idl";
+
+namespace Microsoft.ReactNative {
+
+  [webhosthidden]
+  interface IReactInstance {
+    [noexcept2] void InvokeFunction(String moduleName, String method, IVectorView<IInspectable> arguments);
+  }
 
   [webhosthidden]
   [default_interface]
-  runtimeclass ReactInstance : IReactInstance
-  {
-    ReactInstance();
-  };
-}
+  runtimeclass ReactInstance : IReactInstance {
+    [noexcept2] ReactInstance();
+  }
+} // namespace Microsoft.ReactNative

@@ -3,17 +3,21 @@
 
 #include "pch.h"
 
-#include <OInstance.h>
 #include <cxxreact/CxxModule.h>
 #include <cxxreact/CxxNativeModule.h>
 #include <cxxreact/Instance.h>
 #include <cxxreact/JSBigString.h>
 #include <cxxreact/JSExecutor.h>
 #include <cxxreact/ReactMarker.h>
+#include <jsi/jsi.h>
+#include <jsiexecutor/jsireact/JSIExecutor.h>
+#include "OInstance.h"
 #include "Unicode.h"
 
-#include "../Chakra/ChakraExecutor.h"
-#include "../Chakra/ChakraUtils.h"
+#include "Chakra/ChakraExecutor.h"
+#include "Chakra/ChakraHelpers.h"
+#include "Chakra/ChakraUtils.h"
+#include "JSI/Shared/RuntimeHolder.h"
 
 #if (defined(_MSC_VER) && !defined(WINRT))
 #include "Sandbox/SandboxJSExecutor.h"
@@ -41,12 +45,7 @@
 #include <Shlwapi.h>
 #include <WebSocketJSExecutorFactory.h>
 
-#include <cxxreact/JSExecutor.h>
-
-#if !defined(OSS_RN)
-#include <JSI/Shared/RuntimeHolder.h>
-#include <jsi/jsi.h>
-#include <jsiexecutor/jsireact/JSIExecutor.h>
+#ifdef PATCH_RN
 #if defined(USE_HERMES)
 #include "HermesRuntimeHolder.h"
 #endif
@@ -55,18 +54,13 @@
 #include "V8JSIRuntimeHolder.h"
 #endif
 #include "ChakraRuntimeHolder.h"
+#endif
 
-// foreward declaration.
-namespace facebook {
-namespace react {
-namespace tracing {
+// forward declaration.
+namespace facebook::react::tracing {
 void initializeETW();
 void initializeJSHooks(facebook::jsi::Runtime &runtime);
-} // namespace tracing
-} // namespace react
-} // namespace facebook
-
-#endif
+} // namespace facebook::react::tracing
 
 namespace {
 
@@ -153,11 +147,11 @@ using namespace facebook;
 namespace facebook {
 namespace react {
 
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
 namespace {
 
 void runtimeInstaller(jsi::Runtime &runtime) {
-#ifdef ENABLE_JS_SYSTRACE
+#ifdef ENABLE_JS_SYSTRACE_TO_ETW
   facebook::react::tracing::initializeJSHooks(runtime);
 #endif
 }
@@ -288,7 +282,7 @@ struct BridgeTestInstanceCallback : public InstanceCallback {
 }
 
 #if (defined(_MSC_VER) && !defined(WINRT))
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
 
 /*static*/ std::shared_ptr<InstanceImpl> InstanceImpl::MakeSandbox(
     std::string &&jsString,
@@ -362,7 +356,7 @@ InstanceImpl::InstanceImpl(
   // Temp set the logmarker here
   facebook::react::ReactMarker::logTaggedMarker = logMarker;
 
-#ifdef ENABLE_TRACING
+#ifdef ENABLE_ETW_TRACING
   // TODO :: Find a better place to initialize ETW once per process.
   facebook::react::tracing::initializeETW();
 #endif
@@ -379,7 +373,7 @@ InstanceImpl::InstanceImpl(
 
   // choose ExecutorDelegate and JSExecutor
   std::shared_ptr<JSExecutorFactory> jsef;
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
   std::shared_ptr<ExecutorDelegateFactory> edf;
   if (m_devSettings->useSandbox) {
 #if (defined(_MSC_VER) && !defined(WINRT))
@@ -404,7 +398,7 @@ InstanceImpl::InstanceImpl(
       return;
     }
   } else {
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
     // If the consumer gives us a JSI runtime, then  use it.
     if (m_devSettings->jsiRuntimeHolder) {
       assert(m_devSettings->jsiEngineOverride == JSIEngineOverride::Default);
@@ -489,7 +483,7 @@ InstanceImpl::InstanceImpl(
 
   m_innerInstance->initializeBridge(
       std::make_unique<BridgeUIBatchInstanceCallback>(m_innerInstance, m_uimanager, m_nativeQueue),
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
       edf,
 #endif
       jsef,
@@ -586,6 +580,10 @@ void InstanceImpl::loadBundleInternal(std::string &&jsBundleRelativePath, bool s
       m_innerInstance->loadScriptFromString(std::move(bundleString), jsBundleRelativePath, synchronously);
 #endif
 
+#if defined(_CHAKRACORE_H_)
+    } catch (const facebook::react::ChakraJSException &e) {
+      m_devSettings->errorCallback(std::string{e.what()} + "\r\n" + e.getStack());
+#endif
     } catch (std::exception &e) {
       m_devSettings->errorCallback(e.what());
     }
@@ -593,7 +591,7 @@ void InstanceImpl::loadBundleInternal(std::string &&jsBundleRelativePath, bool s
 }
 
 #if (defined(_MSC_VER) && !defined(WINRT))
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
 
 // For sandbox process.
 InstanceImpl::InstanceImpl(
@@ -730,13 +728,14 @@ std::vector<std::unique_ptr<NativeModule>> InstanceImpl::GetDefaultNativeModules
 
   // TODO - Encapsulate this in a helpers, and make sure callers add it to their
   // list
-  std::string bundleUrl = m_devSettings->useWebDebugger ? DevServerHelper::get_BundleUrl(
-                                                              m_devSettings->debugHost,
-                                                              m_devSettings->debugBundlePath,
-                                                              m_devSettings->platformName,
-                                                              "true" /*dev*/,
-                                                              "false" /*hot*/)
-                                                        : std::string();
+  std::string bundleUrl = (m_devSettings->useWebDebugger || m_devSettings->liveReloadCallback)
+      ? DevServerHelper::get_BundleUrl(
+            m_devSettings->debugHost,
+            m_devSettings->debugBundlePath,
+            m_devSettings->platformName,
+            "true" /*dev*/,
+            "false" /*hot*/)
+      : std::string();
   modules.push_back(std::make_unique<CxxNativeModule>(
       m_innerInstance,
       facebook::react::SourceCodeModule::name,

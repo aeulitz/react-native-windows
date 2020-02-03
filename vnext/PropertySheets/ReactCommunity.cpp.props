@@ -15,9 +15,9 @@
     </ClCompile>
   </ItemDefinitionGroup>
 
-  <ItemDefinitionGroup Condition="'$(OSS_RN)'=='true'">
+  <ItemDefinitionGroup Condition="'$(PATCH_RN)'=='true'">
     <ClCompile>
-      <PreprocessorDefinitions>OSS_RN;ENUM_BITFIELDS_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PATCH_RN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
 

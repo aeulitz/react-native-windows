@@ -4,7 +4,8 @@
 #include "pch.h"
 
 #include <Modules/NativeUIManager.h>
-#include <winrt\Windows.Foundation.Metadata.h>
+#include <winrt/Windows.Foundation.Metadata.h>
+#include <winrt/Windows.UI.Xaml.Media.h>
 #include "Helpers.h"
 
 namespace winrt {
@@ -58,12 +59,37 @@ bool IsAPIContractVxAvailable() {
   return isAPIContractVxAvailable;
 }
 
+bool IsAPIContractV5Available() {
+  return IsAPIContractVxAvailable<5>();
+}
+
 bool IsAPIContractV6Available() {
   return IsAPIContractVxAvailable<6>();
+}
+
+bool IsAPIContractV7Available() {
+  return IsAPIContractVxAvailable<7>();
+}
+
+bool IsAPIContractV8Available() {
+  return IsAPIContractVxAvailable<8>();
+}
+
+bool IsRS3OrHigher() {
+  return IsAPIContractV5Available();
 }
 
 bool IsRS4OrHigher() {
   return IsAPIContractV6Available();
 }
+
+bool IsRS5OrHigher() {
+  return IsAPIContractV7Available();
+}
+
+bool Is19H1OrHigher() {
+  return IsAPIContractV8Available();
+}
+
 } // namespace uwp
 }; // namespace react

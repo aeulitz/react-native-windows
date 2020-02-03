@@ -14,15 +14,15 @@
 
 'use strict';
 
-var React = require('React');
+var React = require('react');
 var ReactNative = require('ReactNative');
-var StyleSheet = require('StyleSheet');
-var UIManager = require('UIManager');
-var View = require('View');
+var StyleSheet = require('../../StyleSheet/StyleSheet');
+var UIManager = require('../../ReactNative/UIManager');
+var View = require('../View/View');
 
 var keyMirror = require('fbjs/lib/keyMirror');
-var requireNativeComponent = require('requireNativeComponent');
-var resolveAssetSource = require('resolveAssetSource');
+var requireNativeComponent = require('../../ReactNative/requireNativeComponent');
+var resolveAssetSource = require('../../Image/resolveAssetSource');
 
 const createReactClass = require('create-react-class');
 
@@ -173,7 +173,7 @@ var WebView = createReactClass({
     onError && onError(event);
     onLoadEnd && onLoadEnd(event);
     console.error('Encountered an error loading page', event.nativeEvent);
-
+    // $FlowFixMe : Not sure what the issue here is, disabling to get flow check turned on
     this.setState({
       lastErrorEvent: event.nativeEvent,
       viewState: WebViewState.ERROR,
@@ -191,7 +191,7 @@ var WebView = createReactClass({
   },
 });
 
-var RCTWebView = requireNativeComponent('RCTWebView', WebView);
+var RCTWebView = requireNativeComponent('RCTWebView');
 
 var styles = StyleSheet.create({
   container: {

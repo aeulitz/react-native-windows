@@ -1,12 +1,14 @@
 /**
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
+ *
  * @format
+ * @flow
  */
 
 'use strict';
 
-const NativeModules = require('NativeModules');
+const NativeModules = require('../BatchedBridge/NativeModules');
 
 const Platform = {
   OS: 'windows',
@@ -19,6 +21,10 @@ const Platform = {
     return constants && constants.isTesting;
   },
   select: (obj: Object) => ('windows' in obj ? obj.windows : obj.default),
+  get isTV() {
+    const constants = NativeModules.PlatformConstants;
+    return constants ? constants.interfaceIdiom === 'tv' : false;
+  },
 };
 
 module.exports = Platform;

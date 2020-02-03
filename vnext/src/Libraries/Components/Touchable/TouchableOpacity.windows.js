@@ -10,18 +10,18 @@
 
 'use strict';
 
-const Animated = require('Animated');
-const Easing = require('Easing');
-const NativeMethodsMixin = require('NativeMethodsMixin');
-const Platform = require('Platform');
-const React = require('React');
+const Animated = require('../../Animated/src/Animated');
+const Easing = require('../../Animated/src/Easing');
+const NativeMethodsMixin = require('../../Renderer/shims/NativeMethodsMixin');
+const Platform = require('../../Utilities/Platform');
+const React = require('react');
 const PropTypes = require('prop-types');
-const Touchable = require('Touchable');
-const TouchableWithoutFeedback = require('TouchableWithoutFeedback');
+const Touchable = require('./Touchable');
+const TouchableWithoutFeedback = require('./TouchableWithoutFeedback');
 
 const createReactClass = require('create-react-class');
-const ensurePositiveDelayProps = require('ensurePositiveDelayProps');
-const flattenStyle = require('flattenStyle');
+const ensurePositiveDelayProps = require('./ensurePositiveDelayProps');
+const flattenStyle = require('../../StyleSheet/flattenStyle');
 
 import type {Props as TouchableWithoutFeedbackProps} from 'TouchableWithoutFeedback';
 import type {ViewStyleProp} from 'StyleSheet';
@@ -374,11 +374,7 @@ const TouchableOpacity = ((createReactClass({
         onMouseEnter={this.props.onMouseEnter} // [TODO(macOS ISS#2323203)
         onMouseLeave={this.props.onMouseLeave}
         keyDownEvents={handledNativeKeyboardEvents}
-        keyUpEvents={handledNativeKeyboardEvents}
-        onDragEnter={this.props.onDragEnter}
-        onDragLeave={this.props.onDragLeave}
-        onDrop={this.props.onDrop}
-        draggedTypes={this.props.draggedTypes}>
+        keyUpEvents={handledNativeKeyboardEvents}>
         {this.props.children}
         {Touchable.renderDebugView({
           color: 'cyan',

@@ -2,6 +2,174 @@
   "name": "react-native-windows-extended",
   "entries": [
     {
+      "date": "Thu, 30 Jan 2020 23:29:21 GMT",
+      "tag": "react-native-windows-extended_v0.60.69-11",
+      "version": "0.60.69-11",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Allow Any Prerelease Version 0f 0.60 as Peer Dependency",
+            "author": "nick@nickgerleman.com",
+            "commit": "0461a6f5689e2c8fe99a05d5cef6ee263a070803"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 28 Jan 2020 18:08:35 GMT",
+      "tag": "react-native-windows-extended_v0.60.69-4",
+      "version": "0.60.69-4",
+      "comments": {
+        "prerelease": [
+          {
+            "comment": "Make the native build oblivous to the differences between microsoft/react-native and facebook/react-native with patches",
+            "author": "nick@nickgerleman.com",
+            "commit": "68f3a147f6116de5112a8944ef9a37668b52df80"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 24 Jan 2020 21:21:47 GMT",
+      "tag": "react-native-windows-extended_v0.60.68",
+      "version": "0.60.68",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update to react-native@0.60.0-microsoft.40",
+            "author": "acoates@microsoft.com",
+            "commit": "807e14dc8d30691438bbdecc9ec26e268bfd5dac"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 23 Jan 2020 00:16:13 GMT",
+      "tag": "react-native-windows-extended_v0.60.67",
+      "version": "0.60.67",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Apply React Native Patches for All Consumers of ReackPackageDirectories",
+            "author": "nick@nickgerleman.com",
+            "commit": "e185a5259428c4d172660765628d11b10cac2112"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 14 Jan 2020 17:57:10 GMT",
+      "tag": "react-native-windows-extended_v0.60.66",
+      "version": "0.60.66",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add React Native Source Patching Infrastructure",
+            "author": "nick@nickgerleman.com",
+            "commit": "8a144129746ab7057827a0ff7839475029a11c0b"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 09 Jan 2020 23:20:10 GMT",
+      "tag": "react-native-windows-extended_v0.60.65",
+      "version": "0.60.65",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Header Refactoring Around jsireact to Unblock ms/rn",
+            "author": "nick@nickgerleman.com",
+            "commit": "442b022fd07a7d1712cdada56604b134df0b386f"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 09 Jan 2020 22:06:05 GMT",
+      "tag": "react-native-windows-extended_v0.60.64",
+      "version": "0.60.64",
+      "comments": {
+        "none": [
+          {
+            "comment": "Add GetFacebookReactInstance :: uwpInstance -> react::Instance",
+            "author": "zihanc@microsoft.com",
+            "commit": "f35ed1c42cd2a1d9ed098082bf97babe3bc9c8e6"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Tue, 07 Jan 2020 22:43:44 GMT",
+      "tag": "react-native-windows-extended_v0.60.62",
+      "version": "0.60.62",
+      "comments": {
+        "none": [
+          {
+            "comment": "Split lint tasks into separate build task to speed general build times",
+            "author": "acoates@microsoft.com",
+            "commit": "c343616cc3e447f1edf02dd2d4c52e82c648ee72"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Thu, 12 Dec 2019 22:18:13 GMT",
+      "tag": "react-native-windows-extended_v0.60.43",
+      "version": "0.60.43",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.31",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "c30be94651aff8617b3b38e51414be5323abbfaa"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 06 Dec 2019 19:14:55 GMT",
+      "tag": "react-native-windows-extended_v0.60.37",
+      "version": "0.60.37",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.28",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "aa155be9b8eceffd65212bde25b036d3d0b72d9b"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Fri, 06 Dec 2019 17:14:06 GMT",
+      "tag": "react-native-windows-extended_v0.60.36",
+      "version": "0.60.36",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.26",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "9369a6d9dce845949d33ea52b11c344caf3b8f62"
+          }
+        ]
+      }
+    },
+    {
+      "date": "Mon, 02 Dec 2019 17:34:30 GMT",
+      "tag": "react-native-windows-extended_v0.60.33",
+      "version": "0.60.33",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Updating react-native to version: 0.60.0-microsoft.24",
+            "author": "53619745+rnbot@users.noreply.github.com",
+            "commit": "227b368b47249d0cb4ac468a3a3152a18b6e296e"
+          }
+        ]
+      }
+    },
+    {
       "date": "Thu, 21 Nov 2019 01:46:31 GMT",
       "tag": "react-native-windows-extended_v0.60.23",
       "version": "0.60.23",

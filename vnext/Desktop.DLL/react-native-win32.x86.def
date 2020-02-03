@@ -27,6 +27,7 @@ EXPORTS
 ?Make@IWebSocket@React@Microsoft@@SG?AV?$unique_ptr@UIWebSocket@React@Microsoft@@U?$default_delete@UIWebSocket@React@Microsoft@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@5@@Z
 ?Make@JSBigAbiString@react@facebook@@SG?AV?$unique_ptr@$$CBUJSBigAbiString@react@facebook@@U?$default_delete@$$CBUJSBigAbiString@react@facebook@@@std@@@std@@$$QAV?$unique_ptr@U?$IAbiArray@D@AbiSafe@@UAbiObjectDeleter@2@@5@@Z
 ?MakeMemoryMappedBuffer@JSI@Microsoft@@YG?AV?$shared_ptr@VBuffer@jsi@facebook@@@std@@QB_WI@Z
+?moduleNames@ModuleRegistry@react@facebook@@QAE?AV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@XZ
 ?at@dynamic@folly@@QGBEABU12@V?$Range@PBD@2@@Z
 ?atImpl@dynamic@folly@@AGBEABU12@ABU12@@Z
 ?callJSFunction@Instance@react@facebook@@QAEX$$QAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0$$QAUdynamic@folly@@@Z
@@ -35,10 +36,12 @@ EXPORTS
 ?createUIManagerModule@react@facebook@@YG?AV?$unique_ptr@VCxxModule@module@xplat@facebook@@U?$default_delete@VCxxModule@module@xplat@facebook@@@std@@@std@@V?$shared_ptr@VIUIManager@react@facebook@@@4@@Z
 ?destroy@dynamic@folly@@AAEXXZ
 ?dispatchCommand@ShadowNode@react@facebook@@UAEX_JABUdynamic@folly@@@Z
+?getModuleRegistry@Instance@react@facebook@@QAEAAVModuleRegistry@23@XZ
 ?getPeakJsMemoryUsage@Instance@react@facebook@@QBE_JXZ
 ?get_ptr@dynamic@folly@@QGBEPBU12@V?$Range@PBD@2@@Z
 ?get_ptrImpl@dynamic@folly@@AGBEPBU12@ABU12@@Z
 ?hash@dynamic@folly@@QBEIXZ
+?loadScriptFromString@Instance@react@facebook@@QAEXV?$unique_ptr@$$CBVJSBigString@react@facebook@@U?$default_delete@$$CBVJSBigString@react@facebook@@@std@@@std@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@5@_N@Z
 ?makeConversionError@folly@@YG?AVConversionError@1@W4ConversionCode@1@V?$Range@PBD@1@@Z
 ?parseJson@folly@@YG?AUdynamic@1@V?$Range@PBD@1@@Z
 ?setGlobalVariable@Instance@react@facebook@@QAEXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$unique_ptr@$$CBVJSBigString@react@facebook@@U?$default_delete@$$CBVJSBigString@react@facebook@@@std@@@5@@Z

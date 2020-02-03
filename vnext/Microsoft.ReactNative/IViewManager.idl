@@ -1,7 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.ReactNative.Bridge
+import "IReactModuleBuilder.idl";
+import "IReactContext.idl";
+
+namespace Microsoft.ReactNative
 {
   [webhosthidden]
   enum ViewManagerPropertyType
@@ -20,12 +23,18 @@ namespace Microsoft.ReactNative.Bridge
     String Name { get; };
 
     Windows.UI.Xaml.FrameworkElement CreateView();
-  };
+  }
+
+  [webhosthidden]
+  interface IViewManagerWithReactContext
+  {
+    IReactContext ReactContext { get; set; };
+  }
 
   [webhosthidden]
   interface IViewManagerWithExportedViewConstants
   {
-    Windows.Foundation.Collections.IMapView<String, IInspectable> ExportedViewConstants { get; };
+    ConstantProvider ExportedViewConstants { get; };
   }
 
   [webhosthidden]
@@ -33,14 +42,34 @@ namespace Microsoft.ReactNative.Bridge
   {
     Windows.Foundation.Collections.IMapView<String, ViewManagerPropertyType> NativeProps { get; };
 
-    void UpdateProperties(Windows.UI.Xaml.FrameworkElement view, Windows.Foundation.Collections.IMapView<String, IInspectable> propertyMap);
-  };
+    void UpdateProperties(Windows.UI.Xaml.FrameworkElement view, IJSValueReader propertyMapReader);
+  }
 
   [webhosthidden]
   interface IViewManagerWithCommands
   {
     Windows.Foundation.Collections.IMapView<String, Int64> Commands { get; };
 
-    void DispatchCommand(Windows.UI.Xaml.FrameworkElement view, Int64 commandId, Windows.Foundation.Collections.IVectorView<IInspectable> commandArgs);
-  };
-}
+    void DispatchCommand(Windows.UI.Xaml.FrameworkElement view, Int64 commandId, IJSValueReader commandArgsReader);
+  }
+
+  [webhosthidden]
+  interface IViewManagerWithExportedEventTypeConstants
+  {
+    ConstantProvider ExportedCustomBubblingEventTypeConstants { get; };
+
+    ConstantProvider ExportedCustomDirectEventTypeConstants { get; };
+  }
+
+  [webhosthidden]
+  interface IViewManagerWithChildren
+  {
+    void AddView(Windows.UI.Xaml.FrameworkElement parent, Windows.UI.Xaml.UIElement child, Int64 index);
+
+    void RemoveAllChildren(Windows.UI.Xaml.FrameworkElement parent);
+
+    void RemoveChildAt(Windows.UI.Xaml.FrameworkElement parent, Int64 index);
+
+    void ReplaceChild(Windows.UI.Xaml.FrameworkElement parent, Windows.UI.Xaml.UIElement oldChild, Windows.UI.Xaml.UIElement newChild);
+  }
+} // namespace Microsoft.ReactNative

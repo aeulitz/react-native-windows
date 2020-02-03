@@ -8,10 +8,10 @@ trigger:
   batch: true
   branches:
     include:
-      - master
-      - 0.58-vnext-stable
+    # Avoid publishing master builds until we're on 0.61 to avoid version collisions with 0.60-stable
+    # - master
       - 0.59-vnext-stable
-      - fabric
+      - 0.60-stable
 
 pr: none
 
@@ -43,13 +43,13 @@ jobs:
       - task: CmdLine@2
         displayName: Beachball Publish (for master)
         inputs:
-          script: node ./node_modules/beachball/bin/beachball.js publish -n $(npmAuthToken) --yes -m "applying package updates ***NO_CI***" --bump-deps
+          script: node ./node_modules/beachball/bin/beachball.js publish -n $(npmAuthToken) --yes -m "applying package updates ***NO_CI***" --bump-deps --access public
         condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
 
       - task: CmdLine@2
         displayName: Beachball Publish (for other branches)
         inputs:
-          script: node ./node_modules/beachball/bin/beachball.js publish --tag v$(Build.SourceBranchName) --branch origin/$(Build.SourceBranchName) -n $(npmAuthToken) -yes -m "applying package updates ***NO_CI***" --bump-deps
+          script: node ./node_modules/beachball/bin/beachball.js publish --tag v$(Build.SourceBranchName) --branch origin/$(Build.SourceBranchName) -n $(npmAuthToken) -yes -m "applying package updates ***NO_CI***" --bump-deps  --access public
         condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'master'))
 
       - task: CmdLine@2
@@ -126,6 +126,9 @@ jobs:
         ArmDebug:
           BuildConfiguration: Debug
           BuildPlatform: arm
+        Arm64Debug:
+          BuildConfiguration: Debug
+          BuildPlatform: arm64
         X64Release:
           BuildConfiguration: Release
           BuildPlatform: x64
@@ -135,6 +138,9 @@ jobs:
         ArmRelease:
           BuildConfiguration: Release
           BuildPlatform: arm
+        Arm64Release:
+          BuildConfiguration: Release
+          BuildPlatform: arm64
     pool:
       vmImage: $(VmImage)
 
@@ -152,7 +158,7 @@ jobs:
       - template: templates/build-rnw.yml
         parameters:
           project: vnext/ReactWindows-Universal.sln
-          vsComponents: $(VsComponents),Microsoft.VisualStudio.Component.VC.v141.ARM
+          vsComponents: $(VsComponents),Microsoft.VisualStudio.Component.VC.v141.ARM,Microsoft.VisualStudio.Component.VC.v141.ARM64
 
       - template: templates/publish-build-artifacts-for-nuget.yml
         parameters:

@@ -2,19 +2,18 @@
 // Licensed under the MIT License.
 
 import "ReactNativeHost.idl";
-import "ReactContext.idl";
+import "IReactContext.idl";
 
-namespace Microsoft.ReactNative
-{
-    [webhosthidden]
-    runtimeclass ReactInstanceManager
-    {
-        ReactInstanceManager();
-        Microsoft.ReactNative.Bridge.ReactContext CurrentReactContext();
-        void OnSuspend();
-        void OnEnteredBackground();
-        void OnLeavingBackground();
-        void OnResume(OnResumeAction action);
-        void OnBackPressed();
-    }
-}
+namespace Microsoft.ReactNative {
+
+  [webhosthidden]
+  runtimeclass ReactInstanceManager {
+    [noexcept2] ReactInstanceManager();
+    [noexcept2] IReactContext CurrentReactContext();
+    [noexcept2] void OnSuspend();
+    [noexcept2] void OnEnteredBackground();
+    [noexcept2] void OnLeavingBackground();
+    [noexcept2] void OnResume(OnResumeAction action);
+    [noexcept2] void OnBackPressed();
+  }
+} // namespace Microsoft.ReactNative

@@ -5,8 +5,6 @@
     Condition="Exists($([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')))"
     Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
-  <Import Project="$(MSBuildThisFileDirectory)\PropertySheets\ReactPackageDirectories.props" />
-
   <PropertyGroup>
     <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
 
@@ -17,7 +15,6 @@
 
   <PropertyGroup Label="Configuration">
     <ProjectName Condition="'$(ProjectName)'==''">$(MSBuildProjectName)</ProjectName>
-
     <!-- Visual Studio forces using 'Win32' for the 'x86' platform. -->
     <BaseIntDir Condition="'$(Platform)' != 'Win32'">$(ReactNativeWindowsDir)build\$(Platform)\$(Configuration)</BaseIntDir>
     <BaseIntDir Condition="'$(Platform)' == 'Win32'">$(ReactNativeWindowsDir)build\x86\$(Configuration)</BaseIntDir>
@@ -33,5 +30,7 @@
   <Import
     Condition="$(RNWBuildOverrideProps) != ''"
     Project="$(RNWBuildOverrideProps)"/>
+
+  <Import Project="$(MSBuildThisFileDirectory)\PropertySheets\ReactPackageDirectories.props" />
 
 </Project>

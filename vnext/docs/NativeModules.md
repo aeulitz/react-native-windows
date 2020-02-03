@@ -259,10 +259,10 @@ namespace NativeModuleSample
         REACT_CONSTANT(E);
         const double E = M_E;
 
-        REACT_CONSTANT(PI, "Pi");
+        REACT_CONSTANT(PI, L"Pi");
         const double PI = M_PI;
 
-        REACT_METHOD(Add, "add");
+        REACT_METHOD(Add, L"add");
         double Add(double a, double b) noexcept
         {
             double result = a + b;
@@ -302,7 +302,7 @@ namespace NativeModuleSample
 {
     [webhosthidden]
     [default_interface]
-    runtimeclass ReactPackageProvider : Microsoft.ReactNative.Bridge.IReactPackageProvider
+    runtimeclass ReactPackageProvider : Microsoft.ReactNative.IReactPackageProvider
     {
         ReactPackageProvider();
     };
@@ -317,7 +317,7 @@ After that we add the .h and.cpp files:
 
 #include "ReactPackageProvider.g.h"
 
-using namespace winrt::Microsoft::ReactNative::Bridge;
+using namespace winrt::Microsoft::ReactNative;
 
 namespace winrt::NativeModuleSample::implementation
 {
@@ -346,8 +346,7 @@ namespace winrt::NativeModuleSample::factory_implementation
 // order for the AddAttributedModules call below to find them.
 #include "FancyMath.h"
 
-using namespace winrt::Microsoft::ReactNative::Bridge;
-using namespace Microsoft::ReactNative;
+using namespace winrt::Microsoft::ReactNative;
 
 namespace winrt::NativeModuleSample::implementation
 {

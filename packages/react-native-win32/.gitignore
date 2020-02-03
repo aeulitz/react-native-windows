@@ -1,0 +1,12 @@
+/dist
+/flow
+/flow-typed
+/index.*
+/IntegrationTests
+/jest
+/lib
+/Libraries
+/RNTester
+/RNTester.*
+/temp
+/WorkingHeaders

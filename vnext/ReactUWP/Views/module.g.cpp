@@ -1,14 +1,15 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 #include "pch.h"
 #include "DynamicAutomationPeer.h"
 #include "DynamicAutomationProperties.h"
 #include "ViewControl.h"
 #include "ViewPanel.h"
-#include "XamlMetaDataProvider.h"
 
 #include <wrl\module.h>
 
-int32_t WINRT_CALL WINRT_CanUnloadNow() noexcept
+int32_t __stdcall WINRT_CanUnloadNow() noexcept
 {
     if (!::Microsoft::WRL::Module<::Microsoft::WRL::InProc>::GetModule().Terminate())
     {
@@ -24,8 +25,7 @@ int32_t WINRT_CALL WINRT_CanUnloadNow() noexcept
     return 0; // S_OK
 }
 
-int32_t WINRT_CALL WINRT_GetActivationFactory(void* classId, void** factory) noexcept
-{
+int32_t __stdcall WINRT_GetActivationFactory(void *classId, void **factory) noexcept {
     try
     {
         *factory = nullptr;
@@ -61,13 +61,7 @@ int32_t WINRT_CALL WINRT_GetActivationFactory(void* classId, void** factory) noe
             *factory = winrt::detach_abi(winrt::make<winrt::react::uwp::factory_implementation::ViewPanel>());
             return 0;
         }
-
-        if (requal(name, L"react.uwp.XamlMetaDataProvider"))
-        {
-            *factory = winrt::detach_abi(winrt::make<winrt::react::uwp::factory_implementation::XamlMetaDataProvider>());
-          return 0;
-        }
-        
+       
         return ::Microsoft::WRL::Module<::Microsoft::WRL::InProc>::GetModule().GetActivationFactory(static_cast<HSTRING>(classId), reinterpret_cast<::IActivationFactory**>(factory));
     }
     catch (...) { return winrt::to_hresult(); }

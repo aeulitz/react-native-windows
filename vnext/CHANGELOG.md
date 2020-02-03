@@ -1,7 +1,322 @@
 # Change Log - react-native-windows
 
-This log was last generated on Sat, 23 Nov 2019 08:02:20 GMT and should not be manually modified.
+This log was last generated on Thu, 30 Jan 2020 23:29:21 GMT and should not be manually modified.
 
+## 0.60.0-vnext.133
+Thu, 30 Jan 2020 23:29:21 GMT
+
+### Changes
+
+- Allow Any Prerelease Version 0f 0.60 as Peer Dependency (nick@nickgerleman.com)
+## 0.60.0-vnext.132
+Thu, 30 Jan 2020 22:08:51 GMT
+
+### Changes
+
+- Simple fixes to IReactContext.cpp and add a writer helper function for direct event type constant (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.131
+Thu, 30 Jan 2020 21:10:31 GMT
+
+### Changes
+
+- Add callstack to the error message when a JS error occurs. (kinhln@microsoft.com)
+## 0.60.0-vnext.130
+Thu, 30 Jan 2020 09:17:27 GMT
+
+### Changes
+
+- Add as Windows Overrides (nick@nickgerleman.com)
+## 0.60.0-vnext.129
+Thu, 30 Jan 2020 01:22:53 GMT
+
+### Changes
+
+- Share RCTNetworking Library Between windows and windesktop (nick@nickgerleman.com)
+## 0.60.0-vnext.128
+Wed, 29 Jan 2020 01:55:04 GMT
+
+### Changes
+
+- Fix Crash When Running CLI Projects (nick@nickgerleman.com)
+## 0.60.0-vnext.127
+Tue, 28 Jan 2020 18:08:35 GMT
+
+### Changes
+
+- Make the native build oblivous to the differences between microsoft/react-native and facebook/react-native with patches (nick@nickgerleman.com)
+## 0.60.0-vnext.126
+Tue, 28 Jan 2020 16:46:27 GMT
+
+### Changes
+
+- Add Yoga Patch from microsoft/react-native (nick@nickgerleman.com)
+## 0.60.0-vnext.125
+Tue, 28 Jan 2020 06:50:47 GMT
+
+### Changes
+
+- copy IntegrationTests from fork (kmelmon@microsoft.com)
+## 0.60.0-vnext.124
+Sat, 25 Jan 2020 21:45:06 GMT
+
+### Changes
+
+- Removed pch.h from shared items projects (vmorozov@microsoft.com)
+## 0.60.0-vnext.123
+Fri, 24 Jan 2020 22:33:56 GMT
+
+### Changes
+
+- Fork RNTester script and update 'React' to 'react' (email not defined)
+## 0.60.0-vnext.122
+Fri, 24 Jan 2020 21:21:47 GMT
+
+### Changes
+
+- Update to react-native@0.60.0-microsoft.40 (acoates@microsoft.com)
+## 0.60.0-vnext.121
+Thu, 23 Jan 2020 18:42:26 GMT
+
+### Changes
+
+- Logging and Tracing OSS_RN Removal (nick@nickgerleman.com)
+## 0.60.0-vnext.120
+Thu, 23 Jan 2020 06:39:59 GMT
+
+### Changes
+
+- Update Folly Build Logic (nick@nickgerleman.com)
+## 0.60.0-vnext.119
+Thu, 23 Jan 2020 00:16:13 GMT
+
+### Changes
+
+- Apply React Native Patches for All Consumers of ReackPackageDirectories (nick@nickgerleman.com)
+## 0.60.0-vnext.118
+Wed, 22 Jan 2020 07:24:31 GMT
+
+### Changes
+
+- Remove OSS_RN Specialization in unistd.h Stub (nick@nickgerleman.com)
+## 0.60.0-vnext.117
+Wed, 22 Jan 2020 03:15:49 GMT
+
+### Changes
+
+- Added ARM64 variant to Universal projects. (julio.rocha@microsoft.com)
+- Added Mso library required for ReactHost (vmorozov@microsoft.com)
+## 0.60.0-vnext.116
+Wed, 22 Jan 2020 01:31:33 GMT
+
+### Changes
+
+- VM: Adding support for JSValue for ViewManager APIs (jthysell@microsoft.com)
+- Upgrade OpenSSL NuGet to 1.1.1-d.2. (julio.rocha@microsoft.com)
+## 0.60.0-vnext.115
+Thu, 16 Jan 2020 05:34:40 GMT
+
+### Changes
+
+- Add initial set of React Native Patches (nick@nickgerleman.com)
+## 0.60.0-vnext.114
+Thu, 16 Jan 2020 03:02:14 GMT
+
+### Changes
+
+- convert haste imports to use relative requires (kmelmon@microsoft.com)
+## 0.60.0-vnext.113
+Wed, 15 Jan 2020 21:22:45 GMT
+
+### Changes
+
+- Upgrade to OpenSSL 1.1.1d/0. (julio.rocha@microsoft.com)
+## 0.60.0-vnext.112
+Thu, 09 Jan 2020 23:20:10 GMT
+
+### Changes
+
+- Header Refactoring Around jsireact to Unblock ms/rn (nick@nickgerleman.com)
+## 0.60.0-vnext.111
+Thu, 09 Jan 2020 22:06:05 GMT
+
+### Changes
+
+- Add GetFacebookReactInstance :: uwpInstance -> react::Instance (zihanc@microsoft.com)
+- Added unit tests for Events with JSValue args (jthysell@microsoft.com)
+## 0.60.0-vnext.110
+Wed, 08 Jan 2020 23:03:25 GMT
+
+### Changes
+
+- Image - basic svg support (mcota@microsoft.com)
+## 0.60.0-vnext.109
+Wed, 08 Jan 2020 01:43:57 GMT
+
+### Changes
+
+- Fixing bugs when using .NetNative (jthysell@microsoft.com)
+## 0.60.0-vnext.108
+Tue, 07 Jan 2020 19:44:17 GMT
+
+### Changes
+
+- Fix RNTester bundle (#2728) (acoates@microsoft.com)
+## 0.60.0-vnext.107
+Mon, 06 Jan 2020 21:29:21 GMT
+
+### Changes
+
+- Call StartAnimatiom on m_scaleCombined for ScaleX / ScaleY animations (thshea@microsoft.com)
+## 0.60.0-vnext.106
+Mon, 30 Dec 2019 22:14:37 GMT
+
+### Changes
+
+- Avoid app crash because content is not bundled for the first time (licanhua@live.com)
+## 0.60.0-vnext.105
+Fri, 27 Dec 2019 17:01:20 GMT
+
+### Changes
+
+- Changed Microsoft.ReactNative to be independent from ReactUWP project (vmorozov@microsoft.com)
+## 0.60.0-vnext.104
+Sat, 21 Dec 2019 03:41:33 GMT
+
+### Changes
+
+- Export ability to query native module names (ngerlem@microsoft.com)
+## 0.60.0-vnext.103
+Sat, 21 Dec 2019 00:18:22 GMT
+
+### Changes
+
+- Fix RNTester bundle (#2728) (acoates@microsoft.com)
+## 0.60.0-vnext.102
+Fri, 20 Dec 2019 19:01:50 GMT
+
+### Changes
+
+- Provide source uri in SourceCode module when using livereload (acoates@microsoft.com)
+## 0.60.0-vnext.101
+Fri, 20 Dec 2019 18:19:02 GMT
+
+### Changes
+
+- Get flow clean, and turn on flow check during build (acoates@microsoft.com)
+## 0.60.0-vnext.100
+Fri, 20 Dec 2019 05:18:08 GMT
+
+### Changes
+
+- Fix cornerRadius issue for TextInput and some updates to TreeDump (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.99
+Thu, 19 Dec 2019 18:44:51 GMT
+
+### Changes
+
+- Removed Bridge sub-namespace in favor of Microsoft.ReactNative (vmorozov@microsoft.com)
+## 0.60.0-vnext.98
+Wed, 18 Dec 2019 21:47:15 GMT
+
+### Changes
+
+- port windowsbrush changes from Microsoft fork of react-native (kmelmon@microsoft.com)
+## 0.60.0-vnext.97
+Wed, 18 Dec 2019 01:40:40 GMT
+
+### Changes
+
+- Conditionally use BitmapImage (email not defined)
+## 0.60.0-vnext.96
+Mon, 16 Dec 2019 21:22:31 GMT
+
+### Changes
+
+- TreeDump for E2E test and fix for image border issue (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.95
+Fri, 13 Dec 2019 17:32:38 GMT
+
+### Changes
+
+- Fix toggle debugger setting issue with ReactApplication (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.94
+Thu, 12 Dec 2019 22:18:13 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.31 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.93
+Thu, 12 Dec 2019 00:17:06 GMT
+
+### Changes
+
+- Strongly typed value serialization and deserialization using IJSValueReader, JSValue, and IJSValueWriter (vmorozov@microsoft.com)
+## 0.60.0-vnext.92
+Wed, 11 Dec 2019 23:31:47 GMT
+
+### Changes
+
+- Submitting the ETW schema resouce dll and the register script (anandrag@microsoft.com)
+## 0.60.0-vnext.91
+Mon, 09 Dec 2019 18:40:45 GMT
+
+### Changes
+
+- Aligning Microsoft.Windows.CppWinRT Versions (jthysell@microsoft.com)
+## 0.60.0-vnext.90
+Fri, 06 Dec 2019 21:56:22 GMT
+
+### Changes
+
+- Update E2ETest to use ReactApplication (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.89
+Fri, 06 Dec 2019 19:14:55 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.28 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.88
+Fri, 06 Dec 2019 17:14:06 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.26 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.87
+Thu, 05 Dec 2019 19:54:18 GMT
+
+### Changes
+
+- Add support for custom ViewManagers with children (jthysell@microsoft.com)
+## 0.60.0-vnext.86
+Tue, 03 Dec 2019 23:21:34 GMT
+
+### Changes
+
+- Add WinUI (licanhua@live.com)
+## 0.60.0-vnext.85
+Mon, 02 Dec 2019 17:34:30 GMT
+
+### Changes
+
+- Updating react-native to version: 0.60.0-microsoft.24 (53619745+rnbot@users.noreply.github.com)
+## 0.60.0-vnext.84
+Tue, 26 Nov 2019 00:13:20 GMT
+
+### Changes
+
+- View Manager Event Support (jthysell@microsoft.com)
+## 0.60.0-vnext.83
+Mon, 25 Nov 2019 21:54:38 GMT
+
+### Changes
+
+- Properly support ScrollView KeyboardDismissMode (dida@ntdev.microsoft.com)
+## 0.60.0-vnext.82
+Mon, 25 Nov 2019 21:23:52 GMT
+
+### Changes
+
+- Revert "Add Winui 2.2 framework package (#3622)" (licanhua@live.com)
 ## 0.60.0-vnext.81
 Sat, 23 Nov 2019 08:02:20 GMT
 

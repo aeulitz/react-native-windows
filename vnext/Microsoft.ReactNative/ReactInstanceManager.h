@@ -4,34 +4,29 @@
 
 #include "ReactInstanceManager.g.h"
 
+#include "IReactContext.h"
 #include "LifecycleState.h"
 #include "NativeModulesProvider.h"
-#include "ReactContext.h"
 #include "ReactInstanceSettings.h"
 #include "ViewManagersProvider.h"
 
 #include <ReactUWP/IReactInstance.h>
 #include <ReactUWP/ReactUwp.h>
 
-using namespace winrt;
-using namespace Microsoft::ReactNative::Bridge;
-using namespace Windows::Foundation;
-using namespace Windows::Foundation::Collections;
-
 namespace winrt::Microsoft::ReactNative::implementation {
 
 struct ReactInstanceManager : ReactInstanceManagerT<ReactInstanceManager> {
   ReactInstanceManager() = default;
   ReactInstanceManager(
-      Microsoft::ReactNative::ReactInstanceSettings instanceSettings,
-      std::string jsBundleFile,
-      std::string jsMainModuleName,
-      IVectorView<IReactPackageProvider> &packageProviders,
+      ReactNative::ReactInstanceSettings const &instanceSettings,
+      std::string const &jsBundleFile,
+      std::string const &jsMainModuleName,
+      Windows::Foundation::Collections::IVectorView<IReactPackageProvider> const &packageProviders,
       bool useDeveloperSupport,
-      LifecycleState initialLifecycleState);
+      LifecycleState const &initialLifecycleState);
 
-  IAsyncOperation<ReactContext> GetOrCreateReactContextAsync();
-  ReactContext CurrentReactContext() {
+  IAsyncOperation<IReactContext> GetOrCreateReactContextAsync();
+  IReactContext CurrentReactContext() {
     return m_currentReactContext;
   }
 
@@ -51,8 +46,8 @@ struct ReactInstanceManager : ReactInstanceManagerT<ReactInstanceManager> {
   void OnBackPressed();
 
  private:
-  ReactContext m_currentReactContext{nullptr};
-  Microsoft::ReactNative::ReactInstanceSettings m_instanceSettings{nullptr};
+  IReactContext m_currentReactContext{nullptr};
+  ReactNative::ReactInstanceSettings m_instanceSettings{nullptr};
   std::string m_jsBundleFile{};
   std::string m_jsMainModuleName{};
   std::vector<IReactPackageProvider> m_packageProviders;
@@ -66,7 +61,7 @@ struct ReactInstanceManager : ReactInstanceManagerT<ReactInstanceManager> {
   //	instances on live reload.
   std::shared_ptr<react::uwp::IReactInstanceCreator> m_reactInstanceCreator{nullptr};
 
-  IAsyncOperation<ReactContext> CreateReactContextCoreAsync();
+  IAsyncOperation<IReactContext> CreateReactContextCoreAsync();
 };
 } // namespace winrt::Microsoft::ReactNative::implementation
 

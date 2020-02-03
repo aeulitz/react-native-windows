@@ -3,21 +3,30 @@
 
 #include "pch.h"
 #include "ABIViewManager.h"
+#include "DynamicReader.h"
+#include "DynamicWriter.h"
+
+#include "IReactContext.h"
 
 #include <ReactUWP/Utils/ValueUtils.h>
-#include "ReactSupport.h"
 
-namespace winrt::Microsoft::ReactNative::Bridge {
+namespace winrt::Microsoft::ReactNative {
 
 ABIViewManager::ABIViewManager(
     const std::shared_ptr<react::uwp::IReactInstance> &reactInstance,
-    const winrt::Microsoft::ReactNative::Bridge::IViewManager &viewManager)
+    const ReactNative::IViewManager &viewManager)
     : Super(reactInstance),
       m_viewManager{viewManager},
+      m_viewManagerWithReactContext{viewManager.try_as<IViewManagerWithReactContext>()},
       m_viewManagerWithExportedViewConstants{viewManager.try_as<IViewManagerWithExportedViewConstants>()},
       m_viewManagerWithNativeProperties{viewManager.try_as<IViewManagerWithNativeProperties>()},
       m_viewManagerWithCommands{viewManager.try_as<IViewManagerWithCommands>()},
+      m_viewManagerWithExportedEventTypeConstants{viewManager.try_as<IViewManagerWithExportedEventTypeConstants>()},
+      m_viewManagerWithChildren{viewManager.try_as<IViewManagerWithChildren>()},
       m_name{to_string(viewManager.Name())} {
+  if (m_viewManagerWithReactContext) {
+    m_viewManagerWithReactContext.ReactContext(winrt::make<ReactContext>(reactInstance).as<IReactContext>());
+  }
   if (m_viewManagerWithNativeProperties) {
     m_nativeProps = m_viewManagerWithNativeProperties.NativeProps();
   }
@@ -36,11 +45,17 @@ folly::dynamic ABIViewManager::GetExportedViewConstants() const {
   folly::dynamic parent = Super::GetExportedViewConstants();
 
   if (m_viewManagerWithExportedViewConstants) {
-    auto outerChild = m_viewManagerWithExportedViewConstants.ExportedViewConstants();
-    for (const auto &pair : outerChild) {
-      std::string key = to_string(pair.Key());
-      folly::dynamic value = ConvertToDynamic(pair.Value());
-      parent.insert(key, value);
+    if (auto constantProvider = m_viewManagerWithExportedViewConstants.ExportedViewConstants()) {
+      IJSValueWriter argWriter = winrt::make<DynamicWriter>();
+      argWriter.WriteObjectBegin();
+      constantProvider(argWriter);
+      argWriter.WriteObjectEnd();
+
+      auto outerChild = argWriter.as<DynamicWriter>()->TakeValue();
+
+      if (!outerChild.isNull()) {
+        parent.update(outerChild);
+      }
     }
   }
 
@@ -87,27 +102,10 @@ void ABIViewManager::UpdateProperties(react::uwp::ShadowNodeBase *nodeToUpdate, 
   if (m_viewManagerWithNativeProperties) {
     auto view = nodeToUpdate->GetView().as<winrt::FrameworkElement>();
 
-    auto propertyMap = winrt::single_threaded_map<hstring, IInspectable>();
+    IJSValueReader propertyMapReader = winrt::make<DynamicReader>(reactDiffMap);
 
-    for (const auto &pair : reactDiffMap.items()) {
-      auto propertyName = pair.first.getString();
-      auto propertyNameHstring = react::uwp::asHstring(propertyName);
-
-      if (const auto &propertyType = m_nativeProps.TryLookup(propertyNameHstring)) {
-        IInspectable propertyValue = nullptr;
-
-        if (propertyType.value() == ViewManagerPropertyType::Color && react::uwp::IsValidColorValue(pair.second)) {
-          propertyValue = react::uwp::BrushFrom(pair.second);
-        } else {
-          propertyValue = ConvertToIInspectable(pair.second);
-        }
-
-        propertyMap.Insert(react::uwp::asHstring(propertyName), propertyValue);
-      }
-    }
-
-    if (propertyMap.Size() > 0) {
-      m_viewManagerWithNativeProperties.UpdateProperties(view, propertyMap.GetView());
+    if (reactDiffMap.size() > 0) {
+      m_viewManagerWithNativeProperties.UpdateProperties(view, propertyMapReader);
     }
   }
 
@@ -136,19 +134,91 @@ void ABIViewManager::DispatchCommand(
   if (m_viewManagerWithCommands) {
     auto view = viewToUpdate.as<winrt::FrameworkElement>();
 
-    auto iinspectableArgs = ConvertToIInspectable(commandArgs);
-
-    auto listArgs =
-        iinspectableArgs.try_as<winrt::Windows::Foundation::Collections::IVectorView<winrt::IInspectable>>();
-
-    if (!listArgs) {
-      auto args = single_threaded_vector<winrt::IInspectable>();
-      args.Append(iinspectableArgs);
-      listArgs = args.GetView();
-    }
-
-    m_viewManagerWithCommands.DispatchCommand(view, commandId, listArgs);
+    IJSValueReader argReader = winrt::make<DynamicReader>(commandArgs);
+    m_viewManagerWithCommands.DispatchCommand(view, commandId, argReader);
   }
 }
 
-} // namespace winrt::Microsoft::ReactNative::Bridge
+folly::dynamic ABIViewManager::GetExportedCustomBubblingEventTypeConstants() const {
+  folly::dynamic parent = Super::GetExportedCustomBubblingEventTypeConstants();
+
+  if (m_viewManagerWithExportedEventTypeConstants) {
+    if (auto constantProvider =
+            m_viewManagerWithExportedEventTypeConstants.ExportedCustomBubblingEventTypeConstants()) {
+      IJSValueWriter argWriter = winrt::make<DynamicWriter>();
+      argWriter.WriteObjectBegin();
+      constantProvider(argWriter);
+      argWriter.WriteObjectEnd();
+
+      auto outerChild = argWriter.as<DynamicWriter>()->TakeValue();
+
+      if (!outerChild.isNull()) {
+        parent.update(outerChild);
+      }
+    }
+  }
+
+  return parent;
+}
+
+folly::dynamic ABIViewManager::GetExportedCustomDirectEventTypeConstants() const {
+  folly::dynamic parent = Super::GetExportedCustomDirectEventTypeConstants();
+
+  if (m_viewManagerWithExportedEventTypeConstants) {
+    if (auto constantProvider = m_viewManagerWithExportedEventTypeConstants.ExportedCustomDirectEventTypeConstants()) {
+      IJSValueWriter argWriter = winrt::make<DynamicWriter>();
+      argWriter.WriteObjectBegin();
+      constantProvider(argWriter);
+      argWriter.WriteObjectEnd();
+
+      auto outerChild = argWriter.as<DynamicWriter>()->TakeValue();
+
+      if (!outerChild.isNull()) {
+        parent.update(outerChild);
+      }
+    }
+  }
+
+  return parent;
+}
+
+void ABIViewManager::AddView(
+    winrt::Windows::UI::Xaml::DependencyObject parent,
+    winrt::Windows::UI::Xaml::DependencyObject child,
+    int64_t index) {
+  if (m_viewManagerWithChildren) {
+    m_viewManagerWithChildren.AddView(parent.as<winrt::FrameworkElement>(), child.as<winrt::UIElement>(), index);
+  } else {
+    Super::AddView(parent, child, index);
+  }
+}
+
+void ABIViewManager::RemoveAllChildren(winrt::Windows::UI::Xaml::DependencyObject parent) {
+  if (m_viewManagerWithChildren) {
+    m_viewManagerWithChildren.RemoveAllChildren(parent.as<winrt::FrameworkElement>());
+  } else {
+    Super::RemoveAllChildren(parent);
+  }
+}
+
+void ABIViewManager::RemoveChildAt(winrt::Windows::UI::Xaml::DependencyObject parent, int64_t index) {
+  if (m_viewManagerWithChildren) {
+    m_viewManagerWithChildren.RemoveChildAt(parent.as<winrt::FrameworkElement>(), index);
+  } else {
+    Super::RemoveChildAt(parent, index);
+  }
+}
+
+void ABIViewManager::ReplaceChild(
+    winrt::Windows::UI::Xaml::DependencyObject parent,
+    winrt::Windows::UI::Xaml::DependencyObject oldChild,
+    winrt::Windows::UI::Xaml::DependencyObject newChild) {
+  if (m_viewManagerWithChildren) {
+    m_viewManagerWithChildren.ReplaceChild(
+        parent.as<winrt::FrameworkElement>(), oldChild.as<winrt::UIElement>(), newChild.as<winrt::UIElement>());
+  } else {
+    Super::ReplaceChild(parent, oldChild, newChild);
+  }
+}
+
+} // namespace winrt::Microsoft::ReactNative

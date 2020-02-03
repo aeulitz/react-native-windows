@@ -250,7 +250,7 @@ void ChakraExecutor::initOnJSVMThread() {
   SystraceSection s("ChakraExecutor.initOnJSVMThread");
 
   bool enableDebugging = m_instanceArgs.EnableDebugging;
-  bool breakOnNextLine = m_instanceArgs.DebuggerBreakOnNextLine;
+  [[maybe_unused]] bool breakOnNextLine = m_instanceArgs.DebuggerBreakOnNextLine;
   bool enableNativePerformanceNow = m_instanceArgs.EnableNativePerformanceNow;
 
   // if there's not already a runtime
@@ -499,9 +499,6 @@ void ChakraExecutor::loadApplicationScript(std::unique_ptr<const JSBigString> sc
 
   ChakraString jsSourceURL(sourceURL.c_str());
 
-#if defined(OSS_RN)
-  evaluateScript(std::move(script), jsSourceURL);
-#else
   auto bundleMetadata = folly::get_ptr(m_instanceArgs.BundleUrlMetadataMap, sourceURL);
 
   // when debugging is enabled, don't use bytecode caching because ChakraCore
@@ -512,7 +509,6 @@ void ChakraExecutor::loadApplicationScript(std::unique_ptr<const JSBigString> sc
     evaluateScriptWithBytecode(
         std::move(script), bundleMetadata->version, jsSourceURL, std::string(bundleMetadata->bytecodeFilename));
   }
-#endif
 
 #if !defined(USE_EDGEMODE_JSRT)
   if (needToRedirectConsoleToDebugger) {
@@ -655,7 +651,7 @@ void *ChakraExecutor::getJavaScriptContext() {
   return m_context;
 }
 
-#if !defined(OSS_RN)
+#ifdef PATCH_RN
 int64_t ChakraExecutor::getPeakJsMemoryUsage() const noexcept {
   return tls_runtimeTracker.MemoryTracker->GetPeakMemoryUsage();
 }

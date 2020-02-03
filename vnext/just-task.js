@@ -36,6 +36,10 @@ task('apiDocumenter', () => {
   );
 });
 
+task('flow-check', () => {
+  require('child_process').execSync('npx flow check', {stdio: 'inherit'});
+});
+
 task('eslint', () => {
   return eslintTask();
 });
@@ -43,7 +47,7 @@ task('copyFlowFiles', () => {
   return copyTask(['src/**/*.js'], '.');
 });
 task('initRNLibraries', () => {
-  require('./Scripts/copyRNLibraries').copyRNLibraries();
+  require('./Scripts/copyRNLibraries').copyRNLibraries(__dirname);
 });
 
 task('ts', () => {
@@ -59,8 +63,8 @@ task('ts', () => {
 });
 task('clean', () => {
   return cleanTask(
-    ['jest', 'Libraries', 'RNTester', 'lib'].map(p =>
-      path.join(process.cwd(), p),
+    ['dist', 'flow', 'flow-typed', 'jest', 'Libraries', 'RNTester', 'lib'].map(
+      p => path.join(process.cwd(), p),
     ),
   );
 });
@@ -69,12 +73,13 @@ task(
   'build',
   series(
     condition('clean', () => true || argv().clean),
-    'eslint',
     'initRNLibraries',
     'copyFlowFiles',
     'ts',
     condition('apiExtractorVerify', () => argv().ci),
-    'apiExtractorUpdate',
-    'apiDocumenter',
   ),
 );
+
+task('lint', series('eslint', 'flow-check'));
+
+task('api', series('apiExtractorUpdate', 'apiDocumenter'));

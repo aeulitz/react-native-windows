@@ -1,17 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace Microsoft.ReactNative.Bridge {
+import "NoExceptionAttribute.idl";
+
+namespace Microsoft.ReactNative {
+
+  // Writer for JSON-like streams or tree structures
+  [webhosthidden]
   interface IJSValueWriter {
-    Boolean WriteNull();
-    Boolean WriteBoolean(Boolean value);
-    Boolean WriteInt64(Int64 value);
-    Boolean WriteDouble(Double value);
-    Boolean WriteString(String value);
-    Boolean WriteObjectBegin();
-    Boolean WritePropertyName(String name);
-    Boolean WriteObjectEnd();
-    Boolean WriteArrayBegin();
-    Boolean WriteArrayEnd();
-  };
-} // namespace Microsoft.ReactNative.Bridge
+    [noexcept2] void WriteNull();
+    [noexcept2] void WriteBoolean(Boolean value);
+    [noexcept2] void WriteInt64(Int64 value);
+    [noexcept2] void WriteDouble(Double value);
+    [noexcept2] void WriteString(String value);
+    [noexcept2] void WriteObjectBegin();
+    [noexcept2] void WritePropertyName(String name);
+    [noexcept2] void WriteObjectEnd();
+    [noexcept2] void WriteArrayBegin();
+    [noexcept2] void WriteArrayEnd();
+  }
+} // namespace Microsoft.ReactNative

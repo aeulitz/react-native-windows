@@ -5,7 +5,7 @@ parameters:
   platform:
   configuration:
   vsComponents: ''
-  vsInstallerUri: 'https://download.visualstudio.microsoft.com/download/pr/c4fef23e-cc45-4836-9544-70e213134bc8/1ee5717e9a1e05015756dff77eb27d554a79a6db91f2716d836df368381af9a1/vs_Enterprise.exe'
+  vsInstallerUri: $(VsInstallerUri)
 
 steps:
   - checkout: self # self represents the repo where the initial Pipelines YAML file was found
@@ -33,6 +33,20 @@ steps:
     displayName: Remove node_modules
     inputs:
       script: rd /S /Q node_modules
+      workingDirectory: vnext
+
+  # Remove directory ignored by npm
+  - task: CmdLine@2
+    displayName: Remove RNTesterCopy
+    inputs:
+      script: rd /S /Q RNTesterCopy
+      workingDirectory: vnext
+
+  # Remove directory ignored by npm
+  - task: CmdLine@2
+    displayName: Remove IntegrationTestsCopy
+    inputs:
+      script: rd /S /Q IntegrationTestsCopy
       workingDirectory: vnext
 
   - task: CmdLine@2
@@ -91,6 +105,7 @@ steps:
       msbuildArguments:
         /p:PreferredToolArchitecture=$(MSBuildPreferredToolArchitecture)
         /p:PlatformToolset=$(MSBuildPlatformToolset)
+        /p:BaseIntDir=$(BaseIntDir)
 
   - task: PublishBuildArtifacts@1
     condition:  succeededOrFailed()

@@ -14,19 +14,17 @@
 #include <cxxreact/Instance.h>
 #include <cxxreact/ModuleRegistry.h>
 
-using namespace winrt;
-using namespace winrt::Microsoft::ReactNative;
-using namespace winrt::Microsoft::ReactNative::Bridge;
 using namespace winrt::Windows::Foundation::Collections;
 
 namespace winrt::Microsoft::ReactNative::implementation {
+
 ReactInstanceManager::ReactInstanceManager(
-    Microsoft::ReactNative::ReactInstanceSettings instanceSettings,
-    std::string jsBundleFile,
-    std::string jsMainModuleName,
-    IVectorView<IReactPackageProvider> &packageProviders,
+    ReactNative::ReactInstanceSettings const &instanceSettings,
+    std::string const &jsBundleFile,
+    std::string const &jsMainModuleName,
+    IVectorView<IReactPackageProvider> const &packageProviders,
     bool useDeveloperSupport,
-    /*TODO*/ LifecycleState /*initialLifecycleState*/)
+    /*TODO*/ LifecycleState const & /*initialLifecycleState*/)
     : m_instanceSettings(instanceSettings),
       m_jsBundleFile(jsBundleFile),
       m_jsMainModuleName(jsMainModuleName),
@@ -121,7 +119,7 @@ std::shared_ptr<react::uwp::IReactInstanceCreator> ReactInstanceManager::Instanc
   return m_reactInstanceCreator;
 }
 
-auto ReactInstanceManager::GetOrCreateReactContextAsync() -> IAsyncOperation<ReactContext> {
+auto ReactInstanceManager::GetOrCreateReactContextAsync() -> IAsyncOperation<IReactContext> {
   if (m_currentReactContext != nullptr)
     co_return m_currentReactContext;
 
@@ -132,9 +130,7 @@ auto ReactInstanceManager::GetOrCreateReactContextAsync() -> IAsyncOperation<Rea
 
 // TODO: Should we make this method async?  On first run when getInstance
 // is called it starts things up. Does this need to block?
-auto ReactInstanceManager::CreateReactContextCoreAsync() -> IAsyncOperation<ReactContext> {
-  auto reactContext = ReactContext();
-
+auto ReactInstanceManager::CreateReactContextCoreAsync() -> IAsyncOperation<IReactContext> {
   /* TODO hook up an exception handler if UseDeveloperSupport is set
   if (m_useDeveloperSupport) {
     if (m_nativeModuleCallExceptionHandler) {
@@ -175,11 +171,9 @@ auto ReactInstanceManager::CreateReactContextCoreAsync() -> IAsyncOperation<Reac
   // TODO: Could access to the module registry be easier if the ReactInstance
   // implementation were lifted up into this project.
 
-  auto instancePtr = InstanceCreator()->getInstance();
-  auto reactInstance = winrt::make<Bridge::implementation::ReactInstance>(instancePtr);
+  auto reactInstance = InstanceCreator()->getInstance();
 
-  Bridge::implementation::ReactContext *contextImpl{get_self<Bridge::implementation::ReactContext>(reactContext)};
-  contextImpl->InitializeWithInstance(reactInstance);
+  auto reactContext = winrt::make<ReactContext>(reactInstance).as<IReactContext>();
 
   // TODO: Investigate whether we need the equivalent of the
   // LimitedConcurrencyActionQueue from the C# implementation that is used to

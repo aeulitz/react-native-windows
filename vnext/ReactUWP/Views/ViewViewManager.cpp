@@ -87,8 +87,15 @@ class ViewShadowNode : public ShadowNodeBase {
   void TabIndex(int32_t tabIndex) {
     m_tabIndex = tabIndex;
 
-    if (IsControl())
-      GetControl().TabIndex(m_tabIndex);
+    if (IsControl()) {
+      if (tabIndex < 0) {
+        GetControl().IsTabStop(false);
+        GetControl().ClearValue(winrt::Control::TabIndexProperty());
+      } else {
+        GetControl().IsTabStop(true);
+        GetControl().TabIndex(tabIndex);
+      }
+    }
   }
 
   bool OnClick() {
@@ -122,8 +129,9 @@ class ViewShadowNode : public ShadowNodeBase {
     }
 
     if (HasOuterBorder()) {
-      auto border = current.try_as<winrt::Border>();
-      border.Child(nullptr);
+      if (auto border = current.try_as<winrt::Border>()) {
+        border.Child(nullptr);
+      }
     }
   }
 
@@ -152,13 +160,15 @@ class ViewShadowNode : public ShadowNodeBase {
     XamlView current = m_view;
 
     if (IsControl()) {
-      auto control = m_view.as<winrt::ContentControl>();
-      current = control.Content().as<XamlView>();
+      if (auto control = m_view.try_as<winrt::ContentControl>()) {
+        current = control.Content().as<XamlView>();
+      }
     }
 
     if (HasOuterBorder()) {
-      auto border = current.try_as<winrt::Border>();
-      current = border.Child().try_as<XamlView>();
+      if (auto border = current.try_as<winrt::Border>()) {
+        current = border.Child().try_as<XamlView>();
+      }
     }
 
     auto panel = current.try_as<winrt::react::uwp::ViewPanel>();
@@ -203,7 +213,7 @@ class ViewShadowNode : public ShadowNodeBase {
 
   bool m_enableFocusRing = true;
   bool m_onClick = false;
-  int32_t m_tabIndex = std::numeric_limits<std::int32_t>::max();
+  int32_t m_tabIndex = -1;
 
   winrt::ContentControl::GotFocus_revoker m_contentControlGotFocusRevoker{};
   winrt::ContentControl::LostFocus_revoker m_contentControlLostFocusRevoker{};
@@ -303,7 +313,7 @@ facebook::react::ShadowNode *ViewViewManager::createShadow() const {
   return new ViewShadowNode();
 }
 
-XamlView ViewViewManager::CreateViewCore(int64_t tag) {
+XamlView ViewViewManager::CreateViewCore(int64_t /*tag*/) {
   auto panel = winrt::make<winrt::react::uwp::implementation::ViewPanel>();
   panel.VerticalAlignment(winrt::VerticalAlignment::Stretch);
   panel.HorizontalAlignment(winrt::HorizontalAlignment::Stretch);

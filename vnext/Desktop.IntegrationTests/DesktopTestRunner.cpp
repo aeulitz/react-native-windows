@@ -7,8 +7,8 @@
 #include <IUIManager.h>
 #include <Modules/AppStateModule.h>
 #include <Modules/NetworkingModule.h>
+#include <Modules/WebSocketModule.h>
 #include <NativeModuleFactories.h>
-#include <WebSocketModule.h>
 #include "ChakraRuntimeHolder.h"
 #include "DesktopTestInstance.h"
 #include "TestMessageQueueThread.h"
@@ -87,6 +87,7 @@ shared_ptr<ITestInstance> TestRunner::GetInstance(
   auto instanceWrapper = CreateReactInstance(
       "",
       std::move(extraModules),
+      nullptr,
       std::move(uiManager),
       std::move(jsQueue),
       std::move(nativeQueue),

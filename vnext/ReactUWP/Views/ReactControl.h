@@ -25,23 +25,24 @@ using namespace Windows::UI::Xaml::Media;
 namespace react {
 namespace uwp {
 
-enum class TriBit { Undefined = -1, NotSet = 0, Set = 1 };
-extern TriBit g_HasActualSizeProperty;
-
-class ReactControl : public std::enable_shared_from_this<ReactControl>, public IXamlReactControl {
+class ReactControl final : public std::enable_shared_from_this<ReactControl>, public IXamlReactControl {
  public:
   ReactControl(IXamlRootView *parent, XamlView rootView);
 
   virtual ~ReactControl();
 
-  XamlView GetXamlView() const noexcept;
+ public: // IXamlRootView
   std::shared_ptr<IReactInstance> GetReactInstance() const noexcept;
+  XamlView GetXamlView() const noexcept;
+
   void SetJSComponentName(std::string &&mainComponentName) noexcept;
   void SetInstanceCreator(const ReactInstanceCreator &instanceCreator) noexcept;
   void SetInitialProps(folly::dynamic &&initialProps) noexcept;
 
   void AttachRoot() noexcept;
   void DetachRoot() noexcept;
+
+ public: // IXamlReactControl
   void blur(XamlView const &xamlView) noexcept override;
 
   void DetachInstance();
@@ -111,6 +112,8 @@ class ReactControl : public std::enable_shared_from_this<ReactControl>, public I
   winrt::Button::Click_revoker m_toggleInspectorRevoker{};
   winrt::Button::Click_revoker m_reloadJSRevoker{};
   winrt::Button::Click_revoker m_liveReloadRevoker{};
+  winrt::Button::Click_revoker m_directDebuggingRevoker{};
+  winrt::Button::Click_revoker m_breakOnNextLineRevoker{};
   winrt::Windows::UI::Core::CoreDispatcher m_uiDispatcher;
   winrt::CoreDispatcher::AcceleratorKeyActivated_revoker m_coreDispatcherAKARevoker{};
 };

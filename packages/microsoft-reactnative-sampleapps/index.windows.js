@@ -13,6 +13,7 @@ import {
   Text,
   UIManager,
   View,
+  Linking,
 } from 'react-native';
 
 import { NativeModules, NativeEventEmitter } from 'react-native';
@@ -44,15 +45,31 @@ var getErrorCallback = function(prefix) {
   };
 };
 
+// To demo JS function calls we define a class and then register it as a callable module
+class SampleModuleCpp {
+  calcDistance(point1, point2) {
+    log('SampleApp.calcDistance()');
+    const distance = Math.hypot(point1.x - point2.x, point1.y - point2.y);
+    log(`Distance between (${point1.x}, ${point1.y}) and (${point2.x}, ${point2.y}) is ${distance}`);
+  }
+}
+global.__fbBatchedBridge.registerLazyCallableModule('SampleModuleCpp', () => new SampleModuleCpp());
+
 class SampleApp extends Component {
   componentDidMount() {
-    this._TimedEventCSSub = SampleModuleCSEmitter.addListener('TimedEventCS', getCallback('SampleModuleCS.TimedEventCS() => '));
-    this._TimedEventCppSub = SampleModuleCppEmitter.addListener('TimedEventCpp', getCallback('SampleModuleCpp.TimedEventCpp() => '));
+    this.timedEventCSSub = SampleModuleCSEmitter.addListener('TimedEventCS', getCallback('SampleModuleCS.TimedEventCS() => '));
+    this.timedEventCppSub = SampleModuleCppEmitter.addListener('TimedEventCpp', getCallback('SampleModuleCpp.TimedEventCpp() => '));
+    this.openURLSub = Linking.addListener('url', (event) => log('Open URL => ' + event.url));
+
+    Linking.getInitialURL()
+      .then(url => log('Initial URL is: ' + url))
+      .catch(err => log('An error occurred: '+ err));
   }
 
   componentWillUnmount() {
-    this._TimedEventCSSub.remove();
-    this._TimedEventCppSub.remove();
+    this.timedEventCSSub.remove();
+    this.timedEventCppSub.remove();
+    this.openURLSub.remove();
   }
 
   onPressSampleModuleCS() {
@@ -82,11 +99,51 @@ class SampleApp extends Component {
 
     NativeModules.SampleModuleCS.ExplicitCallbackMethodWithArgs(numberArg, getCallback('SampleModuleCS.ExplicitCallbackMethodWithArgs => '));
 
+    NativeModules.SampleModuleCS.TwoCallbacksMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCS.TwoCallbacksMethod success => '),
+      getCallback('SampleModuleCS.TwoCallbacksMethod fail => '));
+
+    NativeModules.SampleModuleCS.TwoCallbacksMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCS.TwoCallbacksMethod success => '),
+      getCallback('SampleModuleCS.TwoCallbacksMethod fail => '));
+
+    NativeModules.SampleModuleCS.TwoCallbacksAsyncMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCS.TwoCallbacksAsyncMethod success => '),
+      getCallback('SampleModuleCS.TwoCallbacksAsyncMethod fail => '));
+
+    NativeModules.SampleModuleCS.TwoCallbacksAsyncMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCS.TwoCallbacksAsyncMethod success => '),
+      getCallback('SampleModuleCS.TwoCallbacksAsyncMethod fail => '));
+
+    NativeModules.SampleModuleCS.ReverseTwoCallbacksMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCS.ReverseTwoCallbacksMethod fail => '),
+      getCallback('SampleModuleCS.ReverseTwoCallbacksMethod success => '));
+
+    NativeModules.SampleModuleCS.ReverseTwoCallbacksMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCS.ReverseTwoCallbacksMethod fail => '),
+      getCallback('SampleModuleCS.ReverseTwoCallbacksMethod success => '));
+
+    NativeModules.SampleModuleCS.ReverseTwoCallbacksAsyncMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCS.ReverseTwoCallbacksAsyncMethod fail => '),
+      getCallback('SampleModuleCS.ReverseTwoCallbacksAsyncMethod success => '));
+
+    NativeModules.SampleModuleCS.ReverseTwoCallbacksAsyncMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCS.ReverseTwoCallbacksAsyncMethod fail => '),
+      getCallback('SampleModuleCS.ReverseTwoCallbacksAsyncMethod success => '));
+
     var promise1 = NativeModules.SampleModuleCS.ExplicitPromiseMethod();
     promise1.then(getCallback('SampleModuleCS.ExplicitPromiseMethod then => ')).catch(getErrorCallback('SampleModuleCS.ExplicitPromiseMethod catch => '));
 
     var promise2 = NativeModules.SampleModuleCS.ExplicitPromiseMethodWithArgs(numberArg);
     promise2.then(getCallback('SampleModuleCS.ExplicitPromiseMethodWithArgs then => ')).catch(getErrorCallback('SampleModuleCS.ExplicitPromiseMethodWithArgs catch => '));
+
+    var promise3 = NativeModules.SampleModuleCS.NegateAsyncPromise(5);
+    promise3.then(getCallback('SampleModuleCS.NegateAsyncPromise then => ')).catch(getErrorCallback('SampleModuleCS.NegateAsyncPromise catch => '));
+
+    var promise4 = NativeModules.SampleModuleCS.NegateAsyncPromise(-5);
+    promise4.then(getCallback('SampleModuleCS.NegateAsyncPromise then => ')).catch(getErrorCallback('SampleModuleCS.NegateAsyncPromise catch => '));
+
+    NativeModules.SampleModuleCS.callDistanceFunction({x: 22, y: 23}, {x: 55, y: 65});
 
     log('SampleModuleCS.SyncReturnMethod => ' + NativeModules.SampleModuleCS.SyncReturnMethod());
 
@@ -120,11 +177,51 @@ class SampleApp extends Component {
 
     NativeModules.SampleModuleCpp.ExplicitCallbackMethodWithArgs(numberArg, getCallback('SampleModuleCpp.ExplicitCallbackMethodWithArgs => '));
 
+    NativeModules.SampleModuleCpp.TwoCallbacksMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCpp.TwoCallbacksMethod success => '),
+      getCallback('SampleModuleCpp.TwoCallbacksMethod fail => '));
+
+    NativeModules.SampleModuleCpp.TwoCallbacksMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCpp.TwoCallbacksMethod success => '),
+      getCallback('SampleModuleCpp.TwoCallbacksMethod fail => '));
+
+    NativeModules.SampleModuleCpp.TwoCallbacksAsyncMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCpp.TwoCallbacksAsyncMethod success => '),
+      getCallback('SampleModuleCpp.TwoCallbacksAsyncMethod fail => '));
+
+    NativeModules.SampleModuleCpp.TwoCallbacksAsyncMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCpp.TwoCallbacksAsyncMethod success => '),
+      getCallback('SampleModuleCpp.TwoCallbacksAsyncMethod fail => '));
+
+    NativeModules.SampleModuleCpp.ReverseTwoCallbacksMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksMethod fail => '),
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksMethod success => '));
+
+    NativeModules.SampleModuleCpp.ReverseTwoCallbacksMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksMethod fail => '),
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksMethod success => '));
+
+    NativeModules.SampleModuleCpp.ReverseTwoCallbacksAsyncMethod(/*shouldSucceed:*/true,
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksAsyncMethod fail => '),
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksAsyncMethod success => '));
+
+    NativeModules.SampleModuleCpp.ReverseTwoCallbacksAsyncMethod(/*shouldSucceed:*/false,
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksAsyncMethod fail => '),
+      getCallback('SampleModuleCpp.ReverseTwoCallbacksAsyncMethod success => '));
+
     var promise1 = NativeModules.SampleModuleCpp.ExplicitPromiseMethod();
     promise1.then(getCallback('SampleModuleCpp.ExplicitPromiseMethod then => ')).catch(getErrorCallback('SampleModuleCpp.ExplicitPromiseMethod catch => '));
 
     var promise2 = NativeModules.SampleModuleCpp.ExplicitPromiseMethodWithArgs(numberArg);
     promise2.then(getCallback('SampleModuleCpp.ExplicitPromiseMethodWithArgs then => ')).catch(getErrorCallback('SampleModuleCpp.ExplicitPromiseMethodWithArgs catch => '));
+
+    var promise3 = NativeModules.SampleModuleCpp.NegateAsyncPromise(5);
+    promise3.then(getCallback('SampleModuleCpp.NegateAsyncPromise then => ')).catch(getErrorCallback('SampleModuleCpp.NegateAsyncPromise catch => '));
+
+    var promise4 = NativeModules.SampleModuleCpp.NegateAsyncPromise(-5);
+    promise4.then(getCallback('SampleModuleCpp.NegateAsyncPromise then => ')).catch(getErrorCallback('SampleModuleCpp.NegateAsyncPromise catch => '));
+
+    NativeModules.SampleModuleCpp.callDistanceFunction({x: 2, y: 3}, {x: 5, y: 6});
 
     log('SampleModuleCpp.SyncReturnMethod => ' + NativeModules.SampleModuleCpp.SyncReturnMethod());
 

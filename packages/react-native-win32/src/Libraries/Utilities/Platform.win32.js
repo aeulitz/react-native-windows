@@ -8,23 +8,57 @@
 
 'use strict';
 
-const NativeModules = require('../BatchedBridge/NativeModules');
+import NativePlatformConstantsWin from './NativePlatformConstantsWin';
+
+export type PlatformSelectSpec<D, I> = {
+  default?: D,
+  win32?: I,
+};
 
 const Platform = {
+  __constants: null,
   OS: 'win32',
-  get Version() {
-    const constants = NativeModules.PlatformConstants;
-    return constants && constants.Version;
+  get constants(): {|
+    isTesting: boolean,
+    reactNativeVersion: {|
+      major: number,
+      minor: number,
+      patch: number,
+      prerelease: ?number,
+    |},
+  |} {
+    if (this.__constants == null) {
+      // Hack: We shouldn't need to null-check NativePlatformContants, but
+      // needed to remove the invariant it is non-null since react-native-win32
+      // hasn't picked up the changes we've made in 0.61 to add the module yet.
+      // This can be removed when we fix win32 NativePlatformConstantsWin.
+      if (NativePlatformConstantsWin) {
+        this.__constants = NativePlatformConstantsWin.getConstants();
+      } else {
+        this.__constants = {
+          isTesting: false,
+          reactNativeVersion: {
+            major: 0,
+            minor: 61,
+            patch: 5,
+            prerelease: undefined,
+          },
+        };
+      }
+    }
+    return this.__constants;
   },
   get isTesting(): boolean {
-    const constants = NativeModules.PlatformConstants;
-    return constants && constants.isTesting;
+    if (__DEV__) {
+      return this.constants.isTesting;
+    }
+    return false;
   },
-  select: (obj: Object) => ('win32' in obj ? obj.win32 : obj.default),
   get isTV() {
-    const constants = NativeModules.PlatformConstants;
-    return constants ? constants.interfaceIdiom === 'tv' : false;
+    return false;
   },
+  select: <D, I>(spec: PlatformSelectSpec<D, I>): D | I =>
+    'win32' in spec ? spec.win32 : spec.default,
 };
 
 module.exports = Platform;

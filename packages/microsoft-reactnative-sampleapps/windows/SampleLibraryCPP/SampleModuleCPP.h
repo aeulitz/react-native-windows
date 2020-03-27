@@ -14,10 +14,44 @@
 
 namespace SampleLibraryCpp {
 
+// Point struct can be automatically serialized/deserialized thanks to the custom attributes.
+// Alternatively, we can provide WriteValue and ReadValue functions.
+// See Microsoft.ReactNaitve.Cxx.UnitTests for examples.
+REACT_STRUCT(Point)
+struct Point {
+  REACT_FIELD(X, L"x")
+  int X;
+
+  REACT_FIELD(Y, L"y")
+  int Y;
+};
+
 // Sample REACT_MODULE
 
 REACT_MODULE(SampleModuleCppImpl, L"SampleModuleCpp");
 struct SampleModuleCppImpl {
+#pragma region Initialization
+
+  REACT_INIT(Initialize)
+  void Initialize(IReactContext const & /*reactContext*/) noexcept {
+    m_timer = winrt::Windows::System::Threading::ThreadPoolTimer::CreatePeriodicTimer(
+        [this](const winrt::Windows::System::Threading::ThreadPoolTimer) noexcept {
+          TimedEvent(++m_timerCount);
+          if (m_timer && m_timerCount == 5) {
+            m_timer.Cancel();
+          }
+        },
+        TimedEventInterval);
+  }
+
+  ~SampleModuleCppImpl() {
+    if (m_timer) {
+      m_timer.Cancel();
+    }
+  }
+
+#pragma endregion
+
 #pragma region Constants
 
   REACT_CONSTANT(NumberConstant);
@@ -74,8 +108,66 @@ struct SampleModuleCppImpl {
     callback(M_PI);
   }
 
+  // Use callback order as with ReactPromise
+  REACT_METHOD(TwoCallbacksMethod);
+  void TwoCallbacksMethod(
+      bool shouldSucceed,
+      std::function<void(std::string)> &&onSuccess,
+      std::function<void(std::string)> &&onFailure) noexcept {
+    DEBUG_OUTPUT("TwoCallbacksMethod", shouldSucceed);
+    if (shouldSucceed) {
+      onSuccess("TwoCallbacksMethod succeeded");
+    } else {
+      onFailure("TwoCallbacksMethod failed");
+    }
+  }
+
+  // Use callback order as with ReactPromise
+  REACT_METHOD(TwoCallbacksAsyncMethod);
+  winrt::fire_and_forget TwoCallbacksAsyncMethod(
+      bool shouldSucceed,
+      std::function<void(std::string)> onSuccess,
+      std::function<void(std::string)> onFailure) noexcept {
+    DEBUG_OUTPUT("TwoCallbacksAsyncMethod", shouldSucceed);
+    co_await winrt::resume_background();
+    if (shouldSucceed) {
+      onSuccess("TwoCallbacksMethod succeeded");
+    } else {
+      onFailure("TwoCallbacksMethod failed");
+    }
+  }
+
+  // Use callback order as in "classic" ReactNative.
+  REACT_METHOD(ReverseTwoCallbacksMethod);
+  void ReverseTwoCallbacksMethod(
+      bool shouldSucceed,
+      std::function<void(std::string)> &&onFailure,
+      std::function<void(std::string)> &&onSuccess) noexcept {
+    DEBUG_OUTPUT("ReverseTwoCallbacksMethod", shouldSucceed);
+    if (shouldSucceed) {
+      onSuccess("ReverseTwoCallbacksMethod succeeded");
+    } else {
+      onFailure("ReverseTwoCallbacksMethod failed");
+    }
+  }
+
+  // Use callback order as in "classic" ReactNative.
+  REACT_METHOD(ReverseTwoCallbacksAsyncMethod);
+  winrt::fire_and_forget ReverseTwoCallbacksAsyncMethod(
+      bool shouldSucceed,
+      std::function<void(std::string)> onFailure,
+      std::function<void(std::string)> onSuccess) noexcept {
+    DEBUG_OUTPUT("ReverseTwoCallbacksAsyncMethod", shouldSucceed);
+    co_await winrt::resume_background();
+    if (shouldSucceed) {
+      onSuccess("ReverseTwoCallbacksAsyncMethod succeeded");
+    } else {
+      onFailure("ReverseTwoCallbacksAsyncMethod failed");
+    }
+  }
+
   REACT_METHOD(ExplicitPromiseMethod);
-  void ExplicitPromiseMethod(winrt::Microsoft::ReactNative::ReactPromise<double> &&result) noexcept {
+  void ExplicitPromiseMethod(winrt::Microsoft::ReactNative::ReactPromise<double> const &result) noexcept {
     DEBUG_OUTPUT("ExplicitPromiseMethod");
     try {
       result.Resolve(M_PI);
@@ -87,12 +179,22 @@ struct SampleModuleCppImpl {
   REACT_METHOD(ExplicitPromiseMethodWithArgs);
   void ExplicitPromiseMethodWithArgs(
       double arg,
-      winrt::Microsoft::ReactNative::ReactPromise<double> &&result) noexcept {
+      winrt::Microsoft::ReactNative::ReactPromise<double> const &result) noexcept {
     DEBUG_OUTPUT("ExplicitPromiseMethodWithArgs", arg);
     try {
       result.Resolve(M_PI);
     } catch (const std::exception &ex) {
       result.Reject(ex.what());
+    }
+  }
+
+  REACT_METHOD(NegateAsyncPromise)
+  winrt::fire_and_forget NegateAsyncPromise(int x, ReactPromise<int> result) noexcept {
+    co_await winrt::resume_background();
+    if (x >= 0) {
+      result.Resolve(-x);
+    } else {
+      result.Reject("Already negative");
     }
   }
 
@@ -121,27 +223,22 @@ struct SampleModuleCppImpl {
 
 #pragma endregion
 
- public:
-  SampleModuleCppImpl() {
-    m_timer = winrt::Windows::System::Threading::ThreadPoolTimer::CreatePeriodicTimer(
-        [this](const winrt::Windows::System::Threading::ThreadPoolTimer) noexcept {
-          if (TimedEvent) {
-            TimedEvent(++m_timerCount);
-          }
-        },
-        std::chrono::milliseconds(TimedEventIntervalMS));
+#pragma region JS Functions
+
+  REACT_FUNCTION(CalcDistance, L"calcDistance");
+  std::function<void(Point const &, Point const &)> CalcDistance;
+
+  REACT_METHOD(CallDistanceFunction, L"callDistanceFunction");
+  void CallDistanceFunction(Point &&point1, Point &&point2) noexcept {
+    CalcDistance(point1, point2);
   }
 
-  ~SampleModuleCppImpl() {
-    if (m_timer) {
-      m_timer.Cancel();
-    }
-  }
+#pragma endregion
 
  private:
-  winrt::Windows::System::Threading::ThreadPoolTimer m_timer = nullptr;
-  int m_timerCount = 0;
-  const int TimedEventIntervalMS = 5000;
+  winrt::Windows::System::Threading::ThreadPoolTimer m_timer{nullptr};
+  int m_timerCount{0};
+  static constexpr std::chrono::milliseconds TimedEventInterval{5000};
 };
 
 } // namespace SampleLibraryCpp

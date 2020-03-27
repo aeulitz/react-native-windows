@@ -22,10 +22,10 @@ struct LooperScheduler : Mso::UnknownObject<Mso::RefCountStrategy::WeakRef, IDis
   void AwaitTermination() noexcept override;
 
  private:
-  std::thread m_looperThread;
   ManualResetEvent m_wakeUpEvent;
   Mso::WeakPtr<IDispatchQueueService> m_queue;
   std::atomic_bool m_isShutdown{false};
+  std::thread m_looperThread; // it must be last in the initialization list
 };
 
 //=============================================================================
@@ -33,10 +33,7 @@ struct LooperScheduler : Mso::UnknownObject<Mso::RefCountStrategy::WeakRef, IDis
 //=============================================================================
 
 LooperScheduler::LooperScheduler() noexcept
-    : m_looperThread{[weakSelf = Mso::WeakPtr{this}]() noexcept {RunLoop(weakSelf);
-} // namespace Mso
-}
-{}
+    : m_looperThread([weakSelf = Mso::WeakPtr{this}]() noexcept { RunLoop(weakSelf); }) {}
 
 LooperScheduler::~LooperScheduler() noexcept {
   AwaitTermination();
@@ -50,15 +47,15 @@ LooperScheduler::~LooperScheduler() noexcept {
         while (queue->TryDequeTask(task)) {
           queue->InvokeTask(std::move(task), std::nullopt);
         }
-
-        if (self->m_isShutdown) {
-          break;
-        }
-
-        self->m_wakeUpEvent.Wait();
-        self->m_wakeUpEvent.Reset();
-        continue;
       }
+
+      if (self->m_isShutdown) {
+        break;
+      }
+
+      self->m_wakeUpEvent.Wait();
+      self->m_wakeUpEvent.Reset();
+      continue;
     }
 
     break;
@@ -89,7 +86,14 @@ void LooperScheduler::Shutdown() noexcept {
 void LooperScheduler::AwaitTermination() noexcept {
   Shutdown();
   if (m_looperThread.joinable()) {
-    m_looperThread.join();
+    if (m_looperThread.get_id() != std::this_thread::get_id()) {
+      m_looperThread.join();
+    } else {
+      // We are on the same thread. We cannot join because it would crash because of a deadlock.
+      // We also cannot allow std::thread destructor to run because it would crash on non-joined thread.
+      // So, we just detach and let the underlying system thread finish on its own.
+      m_looperThread.detach();
+    }
   }
 }
 

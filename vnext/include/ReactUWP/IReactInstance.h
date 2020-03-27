@@ -28,9 +28,17 @@ typedef unsigned int LiveReloadCallbackCookie;
 typedef unsigned int ErrorCallbackCookie;
 typedef unsigned int DebuggerAttachCallbackCookie;
 
+enum class JSIEngine : int32_t {
+  Chakra = 0, // Use the JSIExecutorFactory with ChakraRuntime
+  Hermes = 1, // Use the JSIExecutorFactory with Hermes
+  V8 = 2, // Use the JSIExecutorFactory with V8
+};
+
 struct ReactInstanceSettings {
   bool UseWebDebugger{false};
+  bool UseFastRefresh{false};
   bool UseLiveReload{false};
+  bool DebuggerBreakOnNextLine{false};
   bool UseDirectDebugger{false};
   bool UseJsi{true};
   bool EnableJITCompilation{true};
@@ -42,7 +50,8 @@ struct ReactInstanceSettings {
   std::string DebugBundlePath;
   std::string BundleRootPath;
   facebook::react::NativeLoggingHook LoggingCallback;
-  std::function<void(facebook::react::JSExceptionInfo &&)> JsExceptionCallback;
+  std::shared_ptr<Mso::React::IRedBoxHandler> RedBoxHandler;
+  JSIEngine jsiEngine{JSIEngine::Chakra};
 };
 
 struct IReactInstance {

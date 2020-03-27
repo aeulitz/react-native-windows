@@ -1,21 +1,49 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.ReactNative;
+using Microsoft.ReactNative.Managed;
 using System;
 using System.Diagnostics;
-
+using System.Reflection;
+using System.Threading.Tasks;
 using Windows.System.Threading;
-
-using Microsoft.ReactNative.Managed;
 
 namespace SampleLibraryCS
 {
+    class Point
+    {
+        public int x = 0;
+        public int y = 0;
+    };
+
     // Sample ReactModule
 
     [ReactModule]
     internal sealed class SampleModuleCS
     {
-        public string Name => nameof(SampleModuleCS);
+        #region Initializer
+
+        [ReactInitializer]
+        public void Initialize(IReactContext _)
+        {
+            _timer = ThreadPoolTimer.CreatePeriodicTimer(new TimerElapsedHandler((timer) =>
+            {
+                TimedEvent?.Invoke(++_timerCount);
+                if (_timerCount == 5)
+                {
+                    _timer?.Cancel();
+                }
+            }),
+            TimeSpan.FromMilliseconds(TimedEventIntervalMS));
+        }
+
+        ~SampleModuleCS()
+        {
+            _timer?.Cancel();
+        }
+
+        #endregion
 
         #region Constants
 
@@ -39,51 +67,113 @@ namespace SampleLibraryCS
         [ReactMethod]
         public void VoidMethod()
         {
-            Debug.WriteLine($"{Name}.{nameof(VoidMethod)}()");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(VoidMethod)}()");
         }
 
         [ReactMethod]
         public void VoidMethodWithArgs(double arg)
         {
-            Debug.WriteLine($"{Name}.{nameof(VoidMethodWithArgs)}({arg})");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(VoidMethodWithArgs)}({arg})");
         }
 
         [ReactMethod]
         public double ReturnMethod()
         {
-            Debug.WriteLine($"{Name}.{nameof(ReturnMethod)}()");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ReturnMethod)}()");
             return Math.PI;
         }
 
         [ReactMethod]
         public double ReturnMethodWithArgs(double arg)
         {
-            Debug.WriteLine($"{Name}.{nameof(ReturnMethodWithArgs)}({arg})");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ReturnMethodWithArgs)}({arg})");
             return Math.PI;
         }
 
         #endregion
 
-        #region Methods using ReactCallBacks
+        #region Methods using ReactCallbacks
 
         [ReactMethod]
         public void ExplicitCallbackMethod(ReactCallback<double> callback)
         {
-            Debug.WriteLine($"{Name}.{nameof(ExplicitCallbackMethod)}()");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ExplicitCallbackMethod)}()");
             callback(Math.PI);
         }
 
         [ReactMethod]
         public void ExplicitCallbackMethodWithArgs(double arg, ReactCallback<double> callback)
         {
-            Debug.WriteLine($"{Name}.{nameof(ExplicitCallbackMethodWithArgs)}({arg})");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ExplicitCallbackMethodWithArgs)}({arg})");
             callback(Math.PI);
+        }
+
+        // Use callback order as with ReactPromise
+        [ReactMethod]
+        public void TwoCallbacksMethod(bool shouldSucceed, ReactCallback<string> onSuccess, ReactCallback<string> onFailure)
+        {
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(TwoCallbacksMethod)}({shouldSucceed})");
+            if (shouldSucceed)
+            {
+                onSuccess("TwoCallbacksMethod succeeded");
+            }
+            else
+            {
+                onFailure("TwoCallbacksMethod failed");
+            }
+        }
+
+        // Use callback order as with ReactPromise
+        [ReactMethod]
+        public async void TwoCallbacksAsyncMethod(bool shouldSucceed, ReactCallback<string> onSuccess, ReactCallback<string> onFailure)
+        {
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(TwoCallbacksAsyncMethod)}({shouldSucceed})");
+            await Task.Run(() => { });
+            if (shouldSucceed)
+            {
+                onSuccess("TwoCallbacksMethod succeeded");
+            }
+            else
+            {
+                onFailure("TwoCallbacksMethod failed");
+            }
+        }
+
+        // Use callback order as in "classic" ReactNative.
+        [ReactMethod]
+        public void ReverseTwoCallbacksMethod(bool shouldSucceed, ReactCallback<string> onFailure, ReactCallback<string> onSuccess)
+        {
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ReverseTwoCallbacksMethod)}({shouldSucceed})");
+            if (shouldSucceed)
+            {
+                onSuccess("ReverseTwoCallbacksMethod succeeded");
+            }
+            else
+            {
+                onFailure("ReverseTwoCallbacksMethod failed");
+            }
+        }
+
+        // Use callback order as in "classic" ReactNative.
+        [ReactMethod]
+        public async void ReverseTwoCallbacksAsyncMethod(bool shouldSucceed, ReactCallback<string> onFailure, ReactCallback<string> onSuccess)
+        {
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ReverseTwoCallbacksMethod)}({shouldSucceed})");
+            await Task.Run(() => { });
+            if (shouldSucceed)
+            {
+                onSuccess("ReverseTwoCallbacksMethod succeeded");
+            }
+            else
+            {
+                onFailure("ReverseTwoCallbacksMethod failed");
+            }
         }
 
         [ReactMethod]
         public void ExplicitPromiseMethod(IReactPromise<double> result)
         {
-            Debug.WriteLine($"{Name}.{nameof(ExplicitPromiseMethod)}()");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ExplicitPromiseMethod)}()");
 
             try
             {
@@ -98,7 +188,7 @@ namespace SampleLibraryCS
         [ReactMethod]
         public void ExplicitPromiseMethodWithArgs(double arg, IReactPromise<double> result)
         {
-            Debug.WriteLine($"{Name}.{nameof(ExplicitPromiseMethodWithArgs)}({arg})");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(ExplicitPromiseMethodWithArgs)}({arg})");
 
             try
             {
@@ -110,6 +200,21 @@ namespace SampleLibraryCS
             }
         }
 
+        [ReactMethod]
+        public async void NegateAsyncPromise(int x, IReactPromise<int> result)
+        {
+            bool isPosititve = await Task.Run(() => x >= 0);
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(NegateAsyncPromise)}({x})");
+            if (isPosititve)
+            {
+                result.Resolve(-x);
+            }
+            else
+            {
+                result.Reject(new ReactError { Message = "Already negative" });
+            }
+        }
+
         #endregion
 
         #region Synchronous Methods
@@ -117,14 +222,14 @@ namespace SampleLibraryCS
         [ReactSyncMethod]
         public double SyncReturnMethod()
         {
-            Debug.WriteLine($"{Name}.{nameof(SyncReturnMethod)}()");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(SyncReturnMethod)}()");
             return Math.PI;
         }
 
         [ReactSyncMethod]
         public double SyncReturnMethodWithArgs(double arg)
         {
-            Debug.WriteLine($"{Name}.{nameof(SyncReturnMethodWithArgs)}({arg})");
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(SyncReturnMethodWithArgs)}({arg})");
             return Math.PI;
         }
 
@@ -133,23 +238,23 @@ namespace SampleLibraryCS
         #region Events
 
         [ReactEvent("TimedEventCS")]
-        public ReactEvent<int> TimedEvent { get; set; }
+        public Action<int> TimedEvent { get; set; }
 
         #endregion
 
-        public SampleModuleCS()
+        #region JS Functions
+
+        [ReactFunction("calcDistance", ModuleName = "SampleModuleCpp")]
+        public Action<Point, Point> CalcDistance = null;
+
+        [ReactMethod("callDistanceFunction")]
+        public void CallDistanceFunction(Point point1, Point point2)
         {
-            _timer = ThreadPoolTimer.CreatePeriodicTimer(new TimerElapsedHandler((timer) =>
-            {
-                TimedEvent?.Invoke(++_timerCount);
-            }),
-            TimeSpan.FromMilliseconds(TimedEventIntervalMS));
+            Debug.WriteLine($"{nameof(SampleModuleCS)}.{nameof(CallDistanceFunction)}()");
+            CalcDistance(point1, point2);
         }
 
-        ~SampleModuleCS()
-        {
-            _timer?.Cancel();
-        }
+        #endregion
 
         private ThreadPoolTimer _timer;
         private int _timerCount = 0;

@@ -31,7 +31,7 @@ task('apiExtractorUpdate', apiExtractorUpdateTask());
 
 task('apiDocumenter', () => {
   require('child_process').execSync(
-    'npx @microsoft/api-documenter markdown -i temp -o docs/api',
+    'npx @microsoft/api-documenter markdown -i temp -o ../docs/api',
     {stdio: 'inherit'},
   );
 });
@@ -43,6 +43,10 @@ task('flow-check', () => {
 task('eslint', () => {
   return eslintTask();
 });
+task('eslint:fix', () => {
+  return eslintTask({fix: true});
+});
+
 task('copyFlowFiles', () => {
   return copyTask(['src/**/*.js'], '.');
 });
@@ -81,5 +85,6 @@ task(
 );
 
 task('lint', series('eslint', 'flow-check'));
+task('lint:fix', series('eslint:fix'));
 
 task('api', series('apiExtractorUpdate', 'apiDocumenter'));

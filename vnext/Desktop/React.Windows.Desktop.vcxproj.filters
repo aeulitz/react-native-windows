@@ -25,12 +25,6 @@
     <Filter Include="Header Files\Modules">
       <UniqueIdentifier>{ae049213-3bdf-4cbe-83f4-39625a414539}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Sandbox">
-      <UniqueIdentifier>{9434b0e9-90ce-434f-95cd-49901625e4a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Sandbox">
-      <UniqueIdentifier>{fe618c6a-9de2-45a3-b40c-5029177e1063}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Generated Files">
       <UniqueIdentifier>{3f37028f-20c7-4c5c-8504-11059529ab2f}</UniqueIdentifier>
     </Filter>
@@ -65,18 +59,6 @@
     <ClCompile Include="CxxReactWin32\JSBigString.cpp">
       <Filter>Source Files\CxxReactWin32</Filter>
     </ClCompile>
-    <ClCompile Include="Sandbox\SandboxJSExecutor.cpp">
-      <Filter>Source Files\Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="Sandbox\SandboxBridge.cpp">
-      <Filter>Source Files\Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="Sandbox\NamedPipeEndpoint.cpp">
-      <Filter>Source Files\Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="Sandbox\DevSupportManagerSandbox.cpp">
-      <Filter>Source Files\Sandbox</Filter>
-    </ClCompile>
     <ClCompile Include="Executors\WebSocketJSExecutor.cpp">
       <Filter>Source Files\Executors</Filter>
     </ClCompile>
@@ -104,7 +86,7 @@
     <ClCompile Include="LazyDevSupportManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WebSocket.cpp">
+    <ClCompile Include="BeastWebSocketResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
@@ -137,15 +119,6 @@
     <ClInclude Include="Modules\TimingModule.h">
       <Filter>Header Files\Modules</Filter>
     </ClInclude>
-    <ClInclude Include="Sandbox\NamedPipeEndpoint.h">
-      <Filter>Header Files\Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="Sandbox\SandboxBridge.h">
-      <Filter>Header Files\Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="Sandbox\SandboxJSExecutor.h">
-      <Filter>Header Files\Sandbox</Filter>
-    </ClInclude>
     <ClInclude Include="DevSupportManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -161,7 +134,7 @@
     <ClInclude Include="NativeModuleFactories.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WebSocket.h">
+    <ClInclude Include="BeastWebSocketResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

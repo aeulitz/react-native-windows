@@ -9,8 +9,17 @@
 #include "ViewManagerProvider.h"
 #include "XamlView.h"
 
+namespace facebook {
 namespace react {
-namespace uwp {
+class TurboModuleRegistry;
+}
+} // namespace facebook
+
+namespace react {
+struct ReactViewHost;
+} // namespace react
+
+namespace react::uwp {
 
 struct IReactInstance;
 struct IXamlRootView;
@@ -20,6 +29,8 @@ struct IReactInstanceCreator {
   virtual void markAsNeedsReload() = 0;
   virtual void persistUseWebDebugger(bool useWebDebugger) = 0;
   virtual void persistUseLiveReload(bool useLiveReload) = 0;
+  virtual void persistUseDirectDebugger(bool useDirectDebugger) = 0;
+  virtual void persistBreakOnNextLine(bool breakOnNextLine) = 0;
 };
 
 using ReactInstanceCreator = std::shared_ptr<IReactInstanceCreator>;
@@ -28,6 +39,13 @@ REACTWINDOWS_API_(std::shared_ptr<IReactInstance>)
 CreateReactInstance(
     const std::shared_ptr<facebook::react::NativeModuleProvider> &moduleProvider,
     const std::shared_ptr<ViewManagerProvider> &viewManagerProvider = nullptr);
+
+REACTWINDOWS_API_(std::shared_ptr<IReactInstance>)
+CreateReactInstance(
+    const std::shared_ptr<facebook::react::TurboModuleRegistry> &turboModuleRegistry,
+    const std::shared_ptr<facebook::react::NativeModuleProvider> &moduleProvider,
+    const std::shared_ptr<ViewManagerProvider> &viewManagerProvider = nullptr);
+
 REACTWINDOWS_API_(std::shared_ptr<IXamlRootView>)
 CreateReactRootView(XamlView parentView, const wchar_t *pJsComponentName, const ReactInstanceCreator &instanceCreator);
 
@@ -40,5 +58,4 @@ UnSafeCreateReactInstance(
 REACTWINDOWS_API_(std::shared_ptr<facebook::react::MessageQueueThread>)
 CreateWorkerMessageQueue();
 
-} // namespace uwp
-} // namespace react
+} // namespace react::uwp

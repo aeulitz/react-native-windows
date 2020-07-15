@@ -1,8 +1,8 @@
 {
   "type": "none",
-  "comment": "Add ReactInstanceSettings tests",
+  "comment": "Add ReactPackageProvider tests",
   "packageName": "react-native-windows",
   "email": "aeulitz@microsoft.com",
   "dependentChangeType": "none",
-  "date": "2020-07-14T02:23:54.829Z"
+  "date": "2020-07-14T21:02:41.637Z"
 }

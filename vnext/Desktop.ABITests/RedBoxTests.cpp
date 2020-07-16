@@ -36,9 +36,7 @@ struct MockRedBoxHandler : implements<MockRedBoxHandler, Microsoft::ReactNative:
 // instance management becomes available.
 TEST_CLASS (RedBoxTest) {
  public:
-
   TEST_METHOD(Handler_IsCallable) {
-
     std::vector<std::tuple<IRedBoxErrorInfo, RedBoxErrorType>> showNewErrorCalls;
     auto handler = make<MockRedBoxHandler>();
     handler.as<MockRedBoxHandler>()->OnShowNewError = [&showNewErrorCalls](
@@ -50,7 +48,8 @@ TEST_CLASS (RedBoxTest) {
 
     auto frameInfo1 = Microsoft::Internal::TestController::CreateRedBoxErrorFrameInfo(L"abc.js", L"foo", 123, 11);
     auto frameInfo2 = Microsoft::Internal::TestController::CreateRedBoxErrorFrameInfo(L"def.js", L"bar", 234, 22);
-    auto errorInfo = Microsoft::Internal::TestController::CreateRedBoxErrorInfo(L"out of coffee", 1203, {frameInfo1, frameInfo2});
+    auto errorInfo =
+        Microsoft::Internal::TestController::CreateRedBoxErrorInfo(L"out of coffee", 1203, {frameInfo1, frameInfo2});
     settings.RedBoxHandler().ShowNewError(errorInfo, RedBoxErrorType::JavaScriptFatal);
 
     TestCheckEqual(1, showNewErrorCalls.size());

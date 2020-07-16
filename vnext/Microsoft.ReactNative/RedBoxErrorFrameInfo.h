@@ -7,9 +7,9 @@
 
 namespace Mso::React {
 
-struct RedBoxErrorFrameInfo2
-    : public winrt::implements<RedBoxErrorFrameInfo2, winrt::Microsoft::ReactNative::IRedBoxErrorFrameInfo> {
-  RedBoxErrorFrameInfo2(Mso::React::ErrorFrameInfo &&errorFrameInfo) : m_frame(std::move(errorFrameInfo)) {}
+struct RedBoxErrorFrameInfo
+    : public winrt::implements<RedBoxErrorFrameInfo, winrt::Microsoft::ReactNative::IRedBoxErrorFrameInfo> {
+  RedBoxErrorFrameInfo(Mso::React::ErrorFrameInfo &&errorFrameInfo) : m_frame(std::move(errorFrameInfo)) {}
 
   winrt::hstring File() const noexcept;
 

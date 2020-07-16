@@ -6,24 +6,24 @@
 
 namespace Mso::React {
 
-winrt::hstring RedBoxErrorFrameInfo2::File() const noexcept {
+winrt::hstring RedBoxErrorFrameInfo::File() const noexcept {
   return ::Microsoft::Common::Unicode::Utf8ToUtf16(m_frame.File).c_str();
 }
 
-winrt::hstring RedBoxErrorFrameInfo2::Method() const noexcept {
+winrt::hstring RedBoxErrorFrameInfo::Method() const noexcept {
   return ::Microsoft::Common::Unicode::Utf8ToUtf16(m_frame.Method).c_str();
 }
 
-uint32_t RedBoxErrorFrameInfo2::Line() const noexcept {
+uint32_t RedBoxErrorFrameInfo::Line() const noexcept {
   return m_frame.Line;
 }
 
-uint32_t RedBoxErrorFrameInfo2::Column() const noexcept {
+uint32_t RedBoxErrorFrameInfo::Column() const noexcept {
   return m_frame.Column;
 }
 
-bool RedBoxErrorFrameInfo2::Collapse() const noexcept {
+bool RedBoxErrorFrameInfo::Collapse() const noexcept {
   return m_frame.Collapse;
 }
 
-}
+} // namespace Mso::React

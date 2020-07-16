@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 #include "pch.h"
-#include "DynamicReader.h"
 #include "RedBoxErrorInfo.h"
+#include "DynamicReader.h"
 #include "RedBoxErrorFrameInfo.h"
 #include "unicode.h"
 
@@ -35,11 +35,12 @@ uint32_t RedBoxErrorInfo::Id() const noexcept {
   return m_errorInfo.Id;
 }
 
-winrt::Windows::Foundation::Collections::IVectorView<winrt::Microsoft::ReactNative::IRedBoxErrorFrameInfo> RedBoxErrorInfo::Callstack() noexcept {
+winrt::Windows::Foundation::Collections::IVectorView<winrt::Microsoft::ReactNative::IRedBoxErrorFrameInfo>
+RedBoxErrorInfo::Callstack() noexcept {
   if (!m_callstack) {
     m_callstack = winrt::single_threaded_vector<winrt::Microsoft::ReactNative::IRedBoxErrorFrameInfo>();
     for (auto frame : m_errorInfo.Callstack) {
-      m_callstack.Append(winrt::make<RedBoxErrorFrameInfo2>(std::move(frame)));
+      m_callstack.Append(winrt::make<RedBoxErrorFrameInfo>(std::move(frame)));
     }
   }
 

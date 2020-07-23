@@ -55,15 +55,21 @@ class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, 
  public: // ILegacyReactInstance
   void CallJsFunction(std::string &&moduleName, std::string &&method, folly::dynamic &&params) noexcept override;
   void DispatchEvent(int64_t viewTag, std::string &&eventName, folly::dynamic &&eventData) noexcept override;
+#ifndef CORE_ABI
   facebook::react::INativeUIManager *NativeUIManager() noexcept override;
+#endif
   std::shared_ptr<facebook::react::Instance> GetInnerInstance() noexcept override;
   std::string GetBundleRootPath() noexcept override;
+#ifndef CORE_ABI
   std::shared_ptr<react::uwp::IReactInstance> UwpReactInstance() noexcept override;
+#endif
   bool IsLoaded() const noexcept override;
+#ifndef CORE_ABI
   void AttachMeasuredRootView(
       facebook::react::IReactRootView *rootView,
       folly::dynamic &&initialProps) noexcept override;
   void DetachRootView(facebook::react::IReactRootView *rootView) noexcept override;
+#endif
 
  private:
   friend MakePolicy;
@@ -124,7 +130,9 @@ class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, 
   const Mso::Promise<void> m_whenCreated;
   const Mso::Promise<void> m_whenLoaded;
   const Mso::Promise<void> m_whenDestroyed;
+#ifndef CORE_ABI
   const std::shared_ptr<react::uwp::UwpReactInstanceProxy> m_legacyInstance;
+#endif
   const Mso::VoidFunctor m_updateUI;
   const bool m_debuggerBreakOnNextLine : 1;
   const bool m_isFastReloadEnabled : 1;
@@ -159,8 +167,10 @@ class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, 
 
   std::shared_ptr<react::uwp::IReactInstance> m_legacyReactInstance;
   std::shared_ptr<IRedBoxHandler> m_redboxHandler;
+#ifndef CORE_ABI
   std::shared_ptr<react::uwp::AppTheme> m_appTheme;
   Mso::CntPtr<react::uwp::AppearanceChangeListener> m_appearanceListener;
+#endif
   std::string m_bundleRootPath;
   Mso::DispatchQueue m_uiQueue;
   std::deque<JSCallEntry> m_jsCallQueue;

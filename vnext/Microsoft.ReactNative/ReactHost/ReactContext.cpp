@@ -33,15 +33,19 @@ winrt::Microsoft::ReactNative::IReactNotificationService ReactContext::Notificat
 }
 
 void ReactContext::CallJSFunction(std::string &&module, std::string &&method, folly::dynamic &&params) noexcept {
+#ifndef CORE_ABI // requires instance
   if (auto instance = m_reactInstance.GetStrongPtr()) {
     instance->CallJsFunction(std::move(module), std::move(method), std::move(params));
   }
+#endif
 }
 
 void ReactContext::DispatchEvent(int64_t viewTag, std::string &&eventName, folly::dynamic &&eventData) noexcept {
+#ifndef CORE_ABI // requires instance
   if (auto instance = m_reactInstance.GetStrongPtr()) {
     instance->DispatchEvent(viewTag, std::move(eventName), std::move(eventData));
   }
+#endif
 }
 
 }

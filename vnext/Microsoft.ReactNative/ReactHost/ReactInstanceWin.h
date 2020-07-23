@@ -5,9 +5,10 @@
 
 #include "IReactInstanceInternal.h"
 #include "ReactNativeHeaders.h"
-#ifndef CORE_ABI
-#include "React_win.h"
+#include "ReactContext.h"
 #include "activeObject/activeObject.h"
+#include "React_win.h"
+#ifndef CORE_ABI
 
 #include <Modules/AppThemeModuleUwp.h>
 #include <Modules/AppearanceModule.h>
@@ -40,33 +41,6 @@ static_assert(
     static_cast<int32_t>(facebook::react::RCTLogLevel::Fatal) == static_cast<int32_t>(LogLevel::Fatal),
     "LogLevel::Fatal value must match");
 
-class ReactInstanceWin;
-
-class ReactContext final : public Mso::UnknownObject<IReactContext> {
- public:
-  ReactContext(
-      Mso::WeakPtr<ReactInstanceWin> &&reactInstance,
-      winrt::Microsoft::ReactNative::IReactPropertyBag const &properties,
-      winrt::Microsoft::ReactNative::IReactNotificationService const &notifications) noexcept;
-
-  // ReactContext may have longer lifespan than ReactInstance.
-  // The ReactInstance uses the Destroy method to enforce the ReactContext cleaup
-  // when the ReactInstance is destroyed.
-  void Destroy() noexcept;
-
- public: // IReactContext
-  winrt::Microsoft::ReactNative::IReactPropertyBag Properties() noexcept override;
-  winrt::Microsoft::ReactNative::IReactNotificationService Notifications() noexcept override;
-  void CallJSFunction(std::string &&module, std::string &&method, folly::dynamic &&params) noexcept override;
-  void DispatchEvent(int64_t viewTag, std::string &&eventName, folly::dynamic &&eventData) noexcept override;
-
- private:
-  Mso::WeakPtr<ReactInstanceWin> m_reactInstance;
-  winrt::Microsoft::ReactNative::IReactPropertyBag m_properties;
-  winrt::Microsoft::ReactNative::IReactNotificationService m_notifications;
-};
-
-#ifndef CORE_ABI
 //! ReactInstance implementation for Windows that is managed by ReactHost.
 class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, ILegacyReactInstance> {
   using Super = ActiveObjectType;
@@ -191,6 +165,5 @@ class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, 
   Mso::DispatchQueue m_uiQueue;
   std::deque<JSCallEntry> m_jsCallQueue;
 };
-#endif
 
 } // namespace Mso::React

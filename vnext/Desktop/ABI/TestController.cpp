@@ -9,10 +9,13 @@
 #include "DynamicReader.h"
 #include "DynamicWriter.h"
 #include "IReactModuleBuilder.h"
+#include "IReactContext.h"
 #include "ReactPackageBuilder.h"
 #include "RedBoxErrorFrameInfo.h"
 #include "RedBoxErrorInfo.h"
 #include "TestController.h"
+
+#include "ReactHost/ReactInstanceWin.h"
 
 #include "Microsoft.Internal.TestController.g.cpp"
 
@@ -99,6 +102,13 @@ msrn::IJSValueWriter TestController::CreateDynamicWriter() {
 
 msrn::IReactContext TestController::CreateTestContext() {
   return make<TestContext>();
+}
+
+msrn::IReactContext TestController::CreateRealContext(
+    msrn::IReactPropertyBag propertyBag,
+    msrn::IReactNotificationService notificationService) {
+  auto innerContext = Mso::Make<Mso::React::ReactContext>(nullptr, propertyBag, notificationService);
+  return make<msrn::implementation::ReactContext>(innerContext);
 }
 
 msrn::IReactModuleBuilder TestController::CreateReactModuleBuilder(msrn::IReactContext context) {

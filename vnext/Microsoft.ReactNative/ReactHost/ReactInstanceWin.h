@@ -5,6 +5,7 @@
 
 #include "IReactInstanceInternal.h"
 #include "ReactNativeHeaders.h"
+#ifndef CORE_ABI
 #include "React_win.h"
 #include "activeObject/activeObject.h"
 
@@ -12,6 +13,7 @@
 #include <Modules/AppearanceModule.h>
 #include <Modules/I18nManagerModule.h>
 #include "UwpReactInstanceProxy.h"
+#endif
 
 #include <tuple>
 
@@ -64,6 +66,7 @@ class ReactContext final : public Mso::UnknownObject<IReactContext> {
   winrt::Microsoft::ReactNative::IReactNotificationService m_notifications;
 };
 
+#ifndef CORE_ABI
 //! ReactInstance implementation for Windows that is managed by ReactHost.
 class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, ILegacyReactInstance> {
   using Super = ActiveObjectType;
@@ -188,5 +191,6 @@ class ReactInstanceWin final : public Mso::ActiveObject<IReactInstanceInternal, 
   Mso::DispatchQueue m_uiQueue;
   std::deque<JSCallEntry> m_jsCallQueue;
 };
+#endif
 
 } // namespace Mso::React

@@ -8,8 +8,8 @@
 #include <unicode.h>
 #include "DynamicReader.h"
 #include "DynamicWriter.h"
-#include "IReactModuleBuilder.h"
 #include "IReactContext.h"
+#include "IReactModuleBuilder.h"
 #include "ReactPackageBuilder.h"
 #include "RedBoxErrorFrameInfo.h"
 #include "RedBoxErrorInfo.h"

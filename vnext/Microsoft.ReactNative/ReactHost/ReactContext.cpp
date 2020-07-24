@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 #include "ReactContext.h"
-#include "ReactInstanceWin.h"
-#include "Microsoft.ReactNative/IReactNotificationService.h"
 #include <winrt/Microsoft.ReactNative.h>
+#include "Microsoft.ReactNative/IReactNotificationService.h"
+#include "ReactInstanceWin.h"
 
 namespace Mso::React {
 
@@ -19,7 +19,8 @@ ReactContext::ReactContext(
     : m_reactInstance{std::move(reactInstance)}, m_properties{properties}, m_notifications{notifications} {}
 
 void ReactContext::Destroy() noexcept {
-  if (auto notificationService = winrt::get_self<winrt::Microsoft::ReactNative::implementation::ReactNotificationService>(m_notifications)) {
+  if (auto notificationService =
+          winrt::get_self<winrt::Microsoft::ReactNative::implementation::ReactNotificationService>(m_notifications)) {
     notificationService->UnsubscribeAll();
   }
 }
@@ -48,4 +49,4 @@ void ReactContext::DispatchEvent(int64_t viewTag, std::string &&eventName, folly
 #endif
 }
 
-}
+} // namespace Mso::React

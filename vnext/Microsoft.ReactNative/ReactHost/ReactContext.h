@@ -32,4 +32,4 @@ class ReactContext final : public Mso::UnknownObject<IReactContext> {
   winrt::Microsoft::ReactNative::IReactPropertyBag m_properties;
   winrt::Microsoft::ReactNative::IReactNotificationService m_notifications;
 };
-}
+} // namespace Mso::React

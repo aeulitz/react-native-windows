@@ -8,8 +8,8 @@
 #include "ReactNativeHeaders.h"
 #include "React_win.h"
 #include "activeObject/activeObject.h"
-#ifndef CORE_ABI
 
+#ifndef CORE_ABI
 #include <Modules/AppThemeModuleUwp.h>
 #include <Modules/AppearanceModule.h>
 #include <Modules/I18nManagerModule.h>

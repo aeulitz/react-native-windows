@@ -20,7 +20,7 @@ TEST_CLASS (ReactContextTests) {
   ReactContextTests() {
     IReactPropertyBag propertyBag = ReactPropertyBagHelper::CreatePropertyBag();
     IReactNotificationService notificationService = ReactNotificationServiceHelper::CreateNotificationService();
-    m_context = Microsoft::Internal::TestController::CreateRealContext(propertyBag, notificationService);
+    m_context = Microsoft::Internal::TestController::CreateContext(propertyBag, notificationService);
   }
 
   TEST_METHOD(Properties_Get_ReturnsExpectedValue) {

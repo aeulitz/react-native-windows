@@ -18,7 +18,7 @@ TEST_CLASS (ReactModuleBuilderTests) {
   ReactModuleBuilderTests() {
     IReactPropertyBag propertyBag = ReactPropertyBagHelper::CreatePropertyBag();
     IReactNotificationService notificationService = ReactNotificationServiceHelper::CreateNotificationService();
-    IReactContext context = Microsoft::Internal::TestController::CreateRealContext(propertyBag, notificationService);
+    IReactContext context = Microsoft::Internal::TestController::CreateContext(propertyBag, notificationService);
     m_builder = Microsoft::Internal::TestController::CreateReactModuleBuilder(context);
   }
 

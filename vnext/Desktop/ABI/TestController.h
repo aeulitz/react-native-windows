@@ -11,8 +11,7 @@ struct TestController {
 
   static Microsoft::ReactNative::IJSValueReader CreateDynamicReader(Microsoft::ReactNative::IJSValueWriter writer);
   static Microsoft::ReactNative::IJSValueWriter CreateDynamicWriter();
-  static Microsoft::ReactNative::IReactContext CreateTestContext();
-  static Microsoft::ReactNative::IReactContext CreateRealContext(
+  static Microsoft::ReactNative::IReactContext CreateContext(
       Microsoft::ReactNative::IReactPropertyBag propertyBag,
       Microsoft::ReactNative::IReactNotificationService notificationService);
   static Microsoft::ReactNative::IReactModuleBuilder CreateReactModuleBuilder(

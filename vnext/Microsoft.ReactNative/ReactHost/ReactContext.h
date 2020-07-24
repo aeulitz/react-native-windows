@@ -17,7 +17,7 @@ class ReactContext final : public Mso::UnknownObject<IReactContext> {
       winrt::Microsoft::ReactNative::IReactNotificationService const &notifications) noexcept;
 
   // ReactContext may have longer lifespan than ReactInstance.
-  // The ReactInstance uses the Destroy method to enforce the ReactContext cleaup
+  // The ReactInstance uses the Destroy method to enforce the ReactContext cleanup
   // when the ReactInstance is destroyed.
   void Destroy() noexcept;
 

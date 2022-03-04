@@ -241,10 +241,9 @@ void DevSupportManager::StartInspector(
     [[maybe_unused]] const std::string &packagerHost,
     [[maybe_unused]] const uint16_t packagerPort) noexcept {
 #ifdef HERMES_ENABLE_DEBUGGER
-  std::string packageName("RNW");
-  if (auto currentPackage = winrt::Windows::ApplicationModel::Package::Current()) {
-    packageName = winrt::to_string(currentPackage.DisplayName());
-  }
+  // consider that the values used to compose the device URL should be retrievable on both
+  // Win32 and UWP subsystems
+  DWORD currentProcessId = GetCurrentProcessId();
 
   std::string deviceName("RNWHost");
   auto hostNames = winrt::Windows::Networking::Connectivity::NetworkInformation::GetHostNames();
@@ -253,7 +252,8 @@ void DevSupportManager::StartInspector(
   }
 
   m_inspectorPackagerConnection = std::make_shared<InspectorPackagerConnection>(
-      facebook::react::DevServerHelper::get_InspectorDeviceUrl(packagerHost, packagerPort, deviceName, packageName),
+      facebook::react::DevServerHelper::get_InspectorDeviceUrl(
+          packagerHost, packagerPort, deviceName, currentProcessId),
       m_BundleStatusProvider);
   m_inspectorPackagerConnection->connectAsync();
 #endif

@@ -71,12 +71,12 @@ class DevServerHelper {
       const std::string &packagerHost,
       const uint16_t packagerPort,
       const std::string &deviceName,
-      const std::string &packageName) {
+      DWORD pid) {
     return string_format(
         InspectorDeviceUrlFormat,
         GetDeviceLocalHost(packagerHost, packagerPort).c_str(),
         deviceName.c_str(),
-        packageName.c_str());
+        pid);
   }
 
   static constexpr const char DefaultPackagerHost[] = "localhost";
@@ -99,7 +99,7 @@ class DevServerHelper {
   static constexpr const char PackagerConnectionUrlFormat[] = "ws://%s/message";
   static constexpr const char PackagerStatusUrlFormat[] = "http://%s/status";
   static constexpr const char PackagerOpenStackFrameUrlFormat[] = "https://%s/open-stack-frame";
-  static constexpr const char InspectorDeviceUrlFormat[] = "ws://%s/inspector/device?name=%s&app=%s";
+  static constexpr const char InspectorDeviceUrlFormat[] = "ws://%s/inspector/device?name=%s&pid=%u";
 
   static constexpr const char PackagerOkStatus[] = "packager-status:running";
   const int LongPollFailureDelayMs = 5000;

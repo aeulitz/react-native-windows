@@ -1,8 +1,88 @@
 # Change Log - react-native-windows
 
-This log was last generated on Tue, 29 Mar 2022 05:09:50 GMT and should not be manually modified.
+This log was last generated on Tue, 12 Apr 2022 05:10:39 GMT and should not be manually modified.
 
 <!-- Start content -->
+
+## 0.0.0-canary.484
+
+Tue, 12 Apr 2022 05:10:39 GMT
+
+### Changes
+
+- Fix Overrides (34109996+chiaramooney@users.noreply.github.com)
+- Bump @react-native-windows/cli to v0.0.0-canary.124
+- Bump @react-native-windows/virtualized-list to v0.0.0-canary.38
+- Bump @react-native-windows/codegen to v0.0.0-canary.30
+- Bump react-native-platform-override to v1.6.9
+
+## 0.0.0-canary.483
+
+Sat, 09 Apr 2022 05:10:10 GMT
+
+### Changes
+
+- integrate 4/4 (email not defined)
+- Bump @react-native-windows/virtualized-list to v0.0.0-canary.37
+
+## 0.0.0-canary.482
+
+Fri, 08 Apr 2022 05:09:52 GMT
+
+### Changes
+
+- Don't load XAML just to check if we are a XAML app (asklar@microsoft.com)
+- Fix deps script (asklar@microsoft.com)
+- Bump @react-native-windows/cli to v0.0.0-canary.123
+
+## 0.0.0-canary.481
+
+Thu, 07 Apr 2022 05:09:50 GMT
+
+### Changes
+
+- Fix Glog (34109996+chiaramooney@users.noreply.github.com)
+- Enable loading the bundle from an embedded resource via resource://moduleName/resourceId (asklar@microsoft.com)
+
+## 0.0.0-canary.480
+
+Wed, 06 Apr 2022 05:09:24 GMT
+
+### Changes
+
+- [Perf] avoid copying the JS bundle string (asklar@microsoft.com)
+
+## 0.0.0-canary.479
+
+Tue, 05 Apr 2022 05:10:13 GMT
+
+### Changes
+
+- Bump @react-native-windows/virtualized-list to v0.0.0-canary.36
+- Bump react-native-platform-override to v1.6.8
+
+## 0.0.0-canary.478
+
+Fri, 01 Apr 2022 05:09:58 GMT
+
+### Changes
+
+- Bump @react-native-windows/cli to v0.0.0-canary.122
+- Bump @react-native-windows/virtualized-list to v0.0.0-canary.35
+- Bump @react-native-windows/codegen to v0.0.0-canary.29
+- Bump react-native-platform-override to v1.6.7
+
+## 0.0.0-canary.477
+
+Thu, 31 Mar 2022 05:10:18 GMT
+
+### Changes
+
+- TextInput for Fabric (acoates@microsoft.com)
+- Remove deskop base ShadowNode and ViewManager classes (30809111+acoates-ms@users.noreply.github.com)
+- Integrate 3/11 (34109996+chiaramooney@users.noreply.github.com)
+- Avoid crash in DevSupportManager when running in unpackaged apps with Hermes (asklar@microsoft.com)
+- Bump @react-native-windows/virtualized-list to v0.0.0-canary.34
 
 ## 0.0.0-canary.476
 

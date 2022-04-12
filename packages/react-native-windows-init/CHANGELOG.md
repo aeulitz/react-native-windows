@@ -1,8 +1,39 @@
 # Change Log - react-native-windows-init
 
-This log was last generated on Tue, 22 Mar 2022 05:09:21 GMT and should not be manually modified.
+This log was last generated on Tue, 12 Apr 2022 05:10:39 GMT and should not be manually modified.
 
 <!-- Start content -->
+
+## 1.1.95
+
+Tue, 12 Apr 2022 05:10:39 GMT
+
+### Patches
+
+- Fix Overrides (34109996+chiaramooney@users.noreply.github.com)
+- Bump @react-native-windows/fs to v0.0.0-canary.2
+- Bump @react-native-windows/telemetry to v0.0.0-canary.37
+- Bump @react-native-windows/cli to v0.0.0-canary.124
+
+## 1.1.94
+
+Fri, 08 Apr 2022 05:09:52 GMT
+
+### Patches
+
+- Bump @react-native-windows/telemetry to v0.0.0-canary.36
+- Bump @react-native-windows/cli to v0.0.0-canary.123
+
+## 1.1.93
+
+Fri, 01 Apr 2022 05:09:58 GMT
+
+### Patches
+
+- Fix publish after promotion to preview (ngerlem@microsoft.com)
+- Bump @react-native-windows/fs to v0.0.0-canary.1
+- Bump @react-native-windows/telemetry to v0.0.0-canary.35
+- Bump @react-native-windows/cli to v0.0.0-canary.122
 
 ## 1.1.92
 

@@ -1,8 +1,48 @@
 # Change Log - @react-native-windows/virtualized-list
 
-This log was last generated on Tue, 29 Mar 2022 05:09:50 GMT and should not be manually modified.
+This log was last generated on Tue, 12 Apr 2022 05:10:39 GMT and should not be manually modified.
 
 <!-- Start content -->
+
+## 0.0.0-canary.38
+
+Tue, 12 Apr 2022 05:10:39 GMT
+
+### Changes
+
+- Bump react-native-platform-override to v1.6.9
+
+## 0.0.0-canary.37
+
+Sat, 09 Apr 2022 05:10:10 GMT
+
+### Changes
+
+- integrate 4/4 (email not defined)
+
+## 0.0.0-canary.36
+
+Tue, 05 Apr 2022 05:10:13 GMT
+
+### Changes
+
+- Bump react-native-platform-override to v1.6.8
+
+## 0.0.0-canary.35
+
+Fri, 01 Apr 2022 05:09:58 GMT
+
+### Changes
+
+- Bump react-native-platform-override to v1.6.7
+
+## 0.0.0-canary.34
+
+Thu, 31 Mar 2022 05:10:18 GMT
+
+### Changes
+
+- Integrate 3/11 (34109996+chiaramooney@users.noreply.github.com)
 
 ## 0.0.0-canary.33
 

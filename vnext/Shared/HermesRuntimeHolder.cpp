@@ -15,6 +15,7 @@
 
 #if defined(HERMES_ENABLE_DEBUGGER)
 #include <hermes/inspector/chrome/Registration.h>
+#include <process.h>
 #endif
 
 using namespace facebook;
@@ -120,7 +121,7 @@ void HermesRuntimeHolder::initRuntime() noexcept {
     auto adapter = std::make_unique<HermesExecutorRuntimeAdapter>(m_hermesRuntime, *m_hermesRuntime, m_jsQueue);
     facebook::hermes::inspector::chrome::enableDebugging(
         std::move(adapter),
-        devSettings->debuggerRuntimeName.empty() ? "Hermes React Native" : devSettings->debuggerRuntimeName);
+        getDebugTargetName(*devSettings));
   }
 #endif
 
@@ -131,6 +132,26 @@ void HermesRuntimeHolder::initRuntime() noexcept {
                             .getPropertyAsObject(*m_hermesRuntime, "prototype");
   errorPrototype.setProperty(*m_hermesRuntime, "jsEngine", "hermes");
 }
+
+#ifdef HERMES_ENABLE_DEBUGGER
+
+std::string HermesRuntimeHolder::getDebugTargetName(const DevSettings& devSettings)  noexcept {
+  std::stringstream ss;
+
+  if (!devSettings.debuggerRuntimeName.empty()) {
+    ss << devSettings.debuggerRuntimeName;
+  } else if (!devSettings.debugBundlePath.empty()) {
+    ss << devSettings.debugBundlePath;
+  } else {
+    ss << "Hermes React Native";
+  }
+
+  ss << " (PID " << _getpid() << ")";
+  return ss.str();
+}
+
+#endif
+
 
 } // namespace react
 } // namespace facebook

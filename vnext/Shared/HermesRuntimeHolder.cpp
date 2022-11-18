@@ -15,7 +15,6 @@
 
 #if defined(HERMES_ENABLE_DEBUGGER)
 #include <hermes/inspector/chrome/Registration.h>
-#include <process.h>
 #endif
 
 using namespace facebook;
@@ -146,12 +145,20 @@ std::string HermesRuntimeHolder::getDebugTargetName(const DevSettings& devSettin
     ss << "Hermes React Native";
   }
 
-  ss << " (PID " << _getpid() << ")";
+  ss << " (";
+
+  char exeFileName[MAX_PATH];
+  if (DWORD moduleFileNameResult = GetModuleFileNameA(/* current process */ NULL, exeFileName, MAX_PATH); moduleFileNameResult > 0) {
+    if (const char *exeBaseName = strrchr(exeFileName, '\\'); exeBaseName != nullptr) {
+      ss << exeBaseName + 1 << ", ";
+    }
+  }
+
+  ss << "PID " << GetCurrentProcessId() << ")";
   return ss.str();
 }
 
 #endif
-
 
 } // namespace react
 } // namespace facebook
